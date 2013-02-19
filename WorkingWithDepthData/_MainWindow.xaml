@@ -1,0 +1,40 @@
+﻿<Window x:Class="PrototypeUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Prototype UI" Height="800" Width="1280">
+    <Grid>
+        <GroupBox Header="Left Layout" Height="623" HorizontalAlignment="Left" Margin="12,194,0,0" Name="Left" VerticalAlignment="Top" Width="612">
+            <Grid>
+                <Image Height="600" HorizontalAlignment="Left" Name="cursorLeft" Stretch="Fill" VerticalAlignment="Top" Width="600" Source="/PrototypeUI;component/Images/cursor2.png" RenderTransformOrigin="0.5,0.5" />
+                <Image Height="500" HorizontalAlignment="Left" Name="wheelLeft" Stretch="Fill" VerticalAlignment="Top" Width="500" Source="/PrototypeUI;component/Images/layout1.png" RenderTransformOrigin="0.5,0.5" Margin="52,50,0,0" />
+                <TextBox Height="100" HorizontalAlignment="Left" Margin="173,251,0,0" Name="textBoxLeft" VerticalAlignment="Top" Width="250" Opacity="1" FontFamily="Calibri" FontSize="72" Text="--°" Background="{x:Null}" TextAlignment="Center" BorderBrush="{x:Null}" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Left Arm" Height="100" HorizontalAlignment="Left" Margin="12,52,0,0" Name="groupBoxLeft" VerticalAlignment="Top" Width="300">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="207*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <RadioButton Content="Position 1" Height="16" HorizontalAlignment="Left" IsChecked="True" Margin="6,15,0,0" Name="radioButtonLeft1" VerticalAlignment="Top" />
+                <RadioButton Content="Position 2" Height="16" HorizontalAlignment="Left" Margin="6,37,0,0" Name="radioButtonLeft2" VerticalAlignment="Top" />
+                <Slider Grid.ColumnSpan="2" Height="23" HorizontalAlignment="Left" Margin="88,23,0,0" Maximum="180" Minimum="0" Name="sliderLeft" VerticalAlignment="Top" Width="192" ValueChanged="sliderLeft_ValueChanged" Value="90" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Right Layout" Height="623" HorizontalAlignment="Left" Margin="634,194,0,0" Name="Right" VerticalAlignment="Top" Width="612">
+            <Grid>
+                <Image Height="600" HorizontalAlignment="Left" Name="cursorRight" Stretch="Fill" VerticalAlignment="Top" Width="600" Source="/PrototypeUI;component/Images/cursor2.png" RenderTransformOrigin="0.5,0.5" />
+                <Image DataContext="{Binding}" Height="500" HorizontalAlignment="Left" Margin="52,50,0,0" Name="wheelRight" Stretch="Fill" VerticalAlignment="Top" Width="500" Source="/PrototypeUI;component/Images/layout2.png" />
+                <TextBox Background="{x:Null}" FontFamily="Calibri" FontSize="72" Height="100" HorizontalAlignment="Left" Margin="173,250,0,0" Name="textBoxRight" Opacity="1" Text="--°" TextAlignment="Center" VerticalAlignment="Top" Width="250" BorderBrush="{x:Null}" />
+            </Grid>
+        </GroupBox>
+        <TextBox Height="176" HorizontalAlignment="Right" Margin="0,12,318,0" Name="textBox1" VerticalAlignment="Top" Width="622" FontSize="36" FontFamily="Times New Roman" Text="Text Here" />
+        <GroupBox Header="Right Arm" Height="100" HorizontalAlignment="Left" Margin="946,52,0,0" Name="groupBoxRight" VerticalAlignment="Top" Width="300">
+            <Grid>
+                <RadioButton Content="Position 1" Height="16" HorizontalAlignment="Left" Margin="6,15,0,0" Name="radioButtonRight1" VerticalAlignment="Top" IsChecked="True" />
+                <RadioButton Content="Position 2" Height="16" HorizontalAlignment="Left" Margin="6,37,0,0" Name="radioButtonRight2" VerticalAlignment="Top" />
+                <Slider Height="23" HorizontalAlignment="Left" Margin="80,23,0,0" Name="sliderRight" VerticalAlignment="Top" Width="192" Maximum="180" Value="90" ValueChanged="sliderRight_ValueChanged_1" />
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
