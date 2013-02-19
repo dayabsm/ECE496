@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using System.Media;
 using System.Drawing.Drawing2D;
+using System.Resources;
+using System.Reflection;
 
 namespace PrototypeUI
 {
@@ -21,11 +24,19 @@ namespace PrototypeUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        //-- added feb 18
+        Queue<double> right_degrees = new Queue<double>();
+        Queue<double> left_degrees = new Queue<double>();
+
+        const double MAX_DEGREE_DEVIATION = 10.0;   //maybe a percentage is more flexible
+        const int MAX_QUEUE = 5;    //number of previous degrees to take average
+        //--
+
         public MainWindow()
         {
             InitializeComponent();
         }
-
+        
         public void MainLoop()
         {
             while(true)
@@ -45,7 +56,7 @@ namespace PrototypeUI
                 Rotate(cursorRight, wheelRight, angle, position);
             }
         }
-
+        
         private void sliderLeft_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             int position = 0;
@@ -77,7 +88,8 @@ namespace PrototypeUI
 
             Rotate(cursorRight, wheelRight, angle, position);
         }    
-    
+        
+        //last change feb 18
         private void Rotate(Image cursor, Image wheel, double angle, int position)
         {
             BitmapImage newWheel = new BitmapImage();
@@ -97,7 +109,98 @@ namespace PrototypeUI
             wheel.Source = newWheel;
             //wheel.RenderTransform = new RotateTransform(angle);   //rotate wheel instead
 
-            cursor.RenderTransform = new RotateTransform(angle);
+            double new_angle = check_angles(angle, position);
+            if (new_angle != -999.999)
+            {
+                double rounded_angle = Math.Round(new_angle, 0);
+                cursor.RenderTransform = new RotateTransform(rounded_angle);
+            }
         }
+
+        //last change feb 18
+        private double check_angles(double angle, int position)
+        {
+            if (position % 2 == 0)  //even, position 2,4
+            {
+                //if there is 3 or more queues, dequeue 1, and enqueue the current angle
+                //so there is always 3 or less queues
+                if (right_degrees.Count >= MAX_QUEUE)
+                {
+                    //check the current average of the previous degrees
+                    double current_average = 0.0;
+                    foreach (double current in right_degrees)
+                    {
+                        current_average = current_average + current;
+                    }
+                    //check the bounds of the angle with the current average, 
+                    //if the angle is greater of less than current avg is (+/-)40 degrees, discard
+                    if (angle > current_average + MAX_DEGREE_DEVIATION || angle < current_average - MAX_DEGREE_DEVIATION)
+                    {
+                        return -999.999;
+                    }
+                    //if it's not noise, dequeue and add to queue
+                    right_degrees.Dequeue();
+                    right_degrees.Enqueue(angle);
+                }
+                else //else there is less than 3, so enqueue current angle
+                {
+                    right_degrees.Enqueue(angle);
+                }
+                //calculate the average degree and returns
+                double current_degree = 0.0;
+                foreach (double number in right_degrees)
+                {
+                    current_degree = current_degree + number;
+                }
+                double new_average = current_degree / right_degrees.Count;
+                return new_average;
+            }
+            else if (position % 2 == 1) //position 1,3
+            {
+                if (left_degrees.Count >= MAX_QUEUE)
+                {
+                    double current_average = 0.0;
+                    foreach (double current in left_degrees)
+                    {
+                        current_average = current_average + current;
+                    }
+
+                    if (angle > current_average + MAX_DEGREE_DEVIATION || angle < current_average - MAX_DEGREE_DEVIATION)
+                    {
+                        return -999.999;
+                    }
+
+                    left_degrees.Dequeue();
+                    left_degrees.Enqueue(angle);
+                }
+                else
+                {
+                    left_degrees.Enqueue(angle);
+                }
+                double current_degree = 0.0;
+                foreach (double number in right_degrees)
+                {
+                    current_degree = current_degree + number;
+                }
+                double new_average = current_degree / right_degrees.Count;
+                return new_average;
+            }
+            else
+            {
+                return -999.999;
+            }
+        }
+
+        private void PlayLetter(char letter)
+        {
+            /* not in use right now
+            Assembly assembly;
+            SoundPlayer sp;
+            assembly = Assembly.GetExecutingAssembly();
+            sp = new SoundPlayer(assembly.GetManifestResourceStream("test.wav"));
+            sp.Play();            
+             */
+        }
+
     }
 }

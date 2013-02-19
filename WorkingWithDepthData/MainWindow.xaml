@@ -36,7 +36,7 @@
         <GroupBox Header="Right Layout" Height="623" HorizontalAlignment="Left" Margin="634,194,0,0" Name="Right" VerticalAlignment="Top" Width="612">
             <Grid>
                 <Image Height="600" HorizontalAlignment="Left" Name="cursorRight" Stretch="Fill" VerticalAlignment="Top" Width="600" Source="/WorkingWithDepthData;component/Images/cursor2.png" RenderTransformOrigin="0.5,0.5" />
-                <Image DataContext="{Binding}" Height="500" HorizontalAlignment="Left" Margin="52,50,0,0" Name="wheelRight" Stretch="Fill" VerticalAlignment="Top" Width="500" Source="/PrototypeUI;component/Images/layout2.png" />
+                    <Image DataContext="{Binding}" Height="500" HorizontalAlignment="Left" Margin="52,50,0,0" Name="wheelRight" Stretch="Fill" VerticalAlignment="Top" Width="500" Source="/WorkingWithDepthData;component/Images/layout2.png" />
                 <TextBox Background="{x:Null}" FontFamily="Calibri" FontSize="72" Height="100" HorizontalAlignment="Left" Margin="173,250,0,0" Name="textBoxRight" Opacity="1" Text="--°" TextAlignment="Center" VerticalAlignment="Top" Width="250" BorderBrush="{x:Null}" />
             </Grid>
         </GroupBox>

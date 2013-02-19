@@ -41,6 +41,19 @@ namespace WorkingWithDepthData
     ///
     public partial class MainWindow : Window
     {
+        //-- added feb 18
+        
+        Queue<double> right_degrees = new Queue<double>();
+        Queue<double> left_degrees = new Queue<double>();  
+        
+        const double MAX_DEGREE_DEVIATION = 75.0;   //maybe a percentage is more flexible
+        const int MAX_QUEUE = 5;    //number of previous degrees to take average
+        /*
+        double[] right_degrees = new double[MAX_QUEUE];
+        double[] left_degrees = new double[MAX_QUEUE];
+        */
+        //--
+
         public MainWindow()
         {
             InitializeComponent();
@@ -72,7 +85,6 @@ namespace WorkingWithDepthData
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
-
         }
 
         void kinectSensorChooser1_KinectSensorChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -614,11 +626,11 @@ namespace WorkingWithDepthData
             angle = angle - 90;
 
             Rotate(cursorRight, wheelRight, angle, position);
-        }    
-    
+        }
+
+        //last change feb 18
         private void Rotate(Image cursor, Image wheel, double angle, int position)
         {
-
             BitmapImage newWheel = new BitmapImage();
             newWheel.BeginInit();
             if (position == 1)
@@ -634,11 +646,121 @@ namespace WorkingWithDepthData
             newWheel.CacheOption = BitmapCacheOption.OnLoad;
             newWheel.EndInit();
             wheel.Source = newWheel;
-            //wheel.RenderTransform = new RotateTransform(angle);   //rotate wheel instead
+            //wheel.RenderTransform = new RotateTransform(angle);   //rotate wheel instead   
 
-            cursor.RenderTransform = new RotateTransform(angle);
+            double new_angle = check_angles(angle, position);
+            if (new_angle != -999.999)
+            {
+                double rounded_angle = Math.Round(new_angle, 0);
+                cursor.RenderTransform = new RotateTransform(rounded_angle);
+            }
+            
         }
 
+        //last change feb 18
+        /*
+        private double check_angles(double angle, int position)
+        {
+            if (right_degrees[0] == -999.999) //empty
+            {
+                right_degrees[0] = angle;
+                return angle;
+            }
+            else
+            {
+                //shift array by 1
+                for (x = 0; x < MAX_QUEUE-1; x ++)
+            }
+        }
+         */
+        
+        private double check_angles(double angle, int position)
+        {
+            //return angle;
+            if (position % 2 == 0)  //even, position 2,4
+            {
+                //if there is MAX_QUEUE or more queues, dequeue 1, and enqueue the current angle                
+                if (right_degrees.Count >= MAX_QUEUE)
+                {
+                    //check the current average of the previous degrees
+                    double current_average = 0.0;
+                    Queue<double> copyQueueR1 = new Queue<double>(right_degrees.ToArray());
+                    foreach (double current in copyQueueR1)
+                    {
+                        current_average = current_average + current;
+                    }
+                    current_average = current_average / right_degrees.Count;
+
+                    //check range of the current average and compare with the given angle
+                    if (angle < current_average + MAX_DEGREE_DEVIATION && angle > current_average - MAX_DEGREE_DEVIATION)
+                    {
+                        right_degrees.Dequeue();
+                        right_degrees.Enqueue(angle);
+                    }
+                    else
+                    {
+                        return -999.999;
+                    }                        
+                }
+                else //else there is less than MAX_QUEUE, so enqueue current angle
+                {
+                    right_degrees.Enqueue(angle);
+                }
+                //calculate the average degree and returns
+                double current_degree = 0.0;
+                Queue<double> copyQueueR2 = new Queue<double>(right_degrees.ToArray());
+                foreach (double number in copyQueueR2)
+                {
+                    current_degree = current_degree + number;
+                }
+                double new_average = current_degree / right_degrees.Count;
+                return new_average;
+            }
+            else if (position % 2 == 1) //position 1,3
+            {
+                //if there is MAX_QUEUE or more queues, dequeue 1, and enqueue the current angle                
+                if (left_degrees.Count >= MAX_QUEUE)
+                {
+                    //check the current average of the previous degrees
+                    double current_average = 0.0;
+                    Queue<double> copyQueueL1 = new Queue<double>(left_degrees.ToArray());
+                    foreach (double current in copyQueueL1)
+                    {
+                        current_average = current_average + current;
+                    }
+                    current_average = current_average / left_degrees.Count;
+
+                    //check range of the current average and compare with the given angle
+                    if (angle < current_average + MAX_DEGREE_DEVIATION && angle > current_average - MAX_DEGREE_DEVIATION)
+                    {
+                        left_degrees.Dequeue();
+                        left_degrees.Enqueue(angle);
+                    }
+                    else
+                    {
+                        return -999.999;
+                    }
+                }
+                else //else there is less than MAX_QUEUE, so enqueue current angle
+                {
+                    left_degrees.Enqueue(angle);
+                }
+                //calculate the average degree and returns
+                double current_degree = 0.0;
+                Queue<double> copyQueueL2 = new Queue<double>(left_degrees.ToArray());
+                foreach (double number in copyQueueL2)
+                {
+                    current_degree = current_degree + number;
+                }
+                double new_average = current_degree / left_degrees.Count;
+                return new_average;
+            }
+            else
+            {
+                return -999.999;
+            }
+        }
+        
         private void enableTestUI_Click(object sender, RoutedEventArgs e)
         {
             if (enableTestUI.IsChecked == true)

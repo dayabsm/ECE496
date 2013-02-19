@@ -105,7 +105,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dependencies\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
+    <ProjectReference Include="..\..\..\Dependencies\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
       <Project>{4DE23893-27E7-423F-9BB6-BA21DAC2C45E}</Project>
       <Name>Microsoft.Samples.Kinect.WpfViewers</Name>
     </ProjectReference>
@@ -136,6 +136,74 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\layout4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sounds\0.wav" />
+    <EmbeddedResource Include="Sounds\1.wav" />
+    <EmbeddedResource Include="Sounds\2.wav" />
+    <EmbeddedResource Include="Sounds\3.wav" />
+    <EmbeddedResource Include="Sounds\4.wav" />
+    <EmbeddedResource Include="Sounds\5.wav" />
+    <EmbeddedResource Include="Sounds\6.wav" />
+    <EmbeddedResource Include="Sounds\7.wav" />
+    <EmbeddedResource Include="Sounds\8.wav" />
+    <EmbeddedResource Include="Sounds\9.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Sounds\a.wav" />
+    <EmbeddedResource Include="Sounds\Ampersand.wav" />
+    <EmbeddedResource Include="Sounds\Asterisk.wav" />
+    <EmbeddedResource Include="Sounds\at.wav" />
+    <EmbeddedResource Include="Sounds\b.wav" />
+    <EmbeddedResource Include="Sounds\backslash.wav" />
+    <EmbeddedResource Include="Sounds\backspace.wav" />
+    <EmbeddedResource Include="Sounds\c.wav" />
+    <EmbeddedResource Include="Sounds\caret.wav" />
+    <EmbeddedResource Include="Sounds\close bracket.wav" />
+    <EmbeddedResource Include="Sounds\colon.wav" />
+    <EmbeddedResource Include="Sounds\comma.wav" />
+    <EmbeddedResource Include="Sounds\confirm.wav" />
+    <EmbeddedResource Include="Sounds\d.wav" />
+    <EmbeddedResource Include="Sounds\down.wav" />
+    <EmbeddedResource Include="Sounds\e.wav" />
+    <EmbeddedResource Include="Sounds\enter.wav" />
+    <EmbeddedResource Include="Sounds\equal.wav" />
+    <EmbeddedResource Include="Sounds\exclamation.wav" />
+    <EmbeddedResource Include="Sounds\f.wav" />
+    <EmbeddedResource Include="Sounds\forwardslash.wav" />
+    <EmbeddedResource Include="Sounds\g.wav" />
+    <EmbeddedResource Include="Sounds\h.wav" />
+    <EmbeddedResource Include="Sounds\i.wav" />
+    <EmbeddedResource Include="Sounds\j.wav" />
+    <EmbeddedResource Include="Sounds\k.wav" />
+    <EmbeddedResource Include="Sounds\l.wav" />
+    <EmbeddedResource Include="Sounds\left.wav" />
+    <EmbeddedResource Include="Sounds\m.wav" />
+    <EmbeddedResource Include="Sounds\minus.wav" />
+    <EmbeddedResource Include="Sounds\money.wav" />
+    <EmbeddedResource Include="Sounds\n.wav" />
+    <EmbeddedResource Include="Sounds\o.wav" />
+    <EmbeddedResource Include="Sounds\open bracket.wav" />
+    <EmbeddedResource Include="Sounds\p.wav" />
+    <EmbeddedResource Include="Sounds\percent.wav" />
+    <EmbeddedResource Include="Sounds\period.wav" />
+    <EmbeddedResource Include="Sounds\plus.wav" />
+    <EmbeddedResource Include="Sounds\pound.wav" />
+    <EmbeddedResource Include="Sounds\q.wav" />
+    <EmbeddedResource Include="Sounds\question mark.wav" />
+    <EmbeddedResource Include="Sounds\r.wav" />
+    <EmbeddedResource Include="Sounds\right.wav" />
+    <EmbeddedResource Include="Sounds\s.wav" />
+    <EmbeddedResource Include="Sounds\semicolon.wav" />
+    <EmbeddedResource Include="Sounds\space.wav" />
+    <EmbeddedResource Include="Sounds\t.wav" />
+    <EmbeddedResource Include="Sounds\u.wav" />
+    <EmbeddedResource Include="Sounds\up.wav" />
+    <EmbeddedResource Include="Sounds\v.wav" />
+    <EmbeddedResource Include="Sounds\w.wav" />
+    <EmbeddedResource Include="Sounds\x.wav" />
+    <EmbeddedResource Include="Sounds\y.wav" />
+    <EmbeddedResource Include="Sounds\z.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
