@@ -105,12 +105,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Dependencies\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
-      <Project>{4DE23893-27E7-423F-9BB6-BA21DAC2C45E}</Project>
-      <Name>Microsoft.Samples.Kinect.WpfViewers</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\cursor2.png" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +198,12 @@
     <EmbeddedResource Include="Sounds\x.wav" />
     <EmbeddedResource Include="Sounds\y.wav" />
     <EmbeddedResource Include="Sounds\z.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dependencies\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
+      <Project>{4de23893-27e7-423f-9bb6-ba21dac2c45e}</Project>
+      <Name>Microsoft.Samples.Kinect.WpfViewers</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

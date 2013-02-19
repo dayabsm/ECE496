@@ -125,7 +125,7 @@ namespace WorkingWithDepthData
             try
             {
                 newSensor.Start();
-                newSensor.ElevationAngle = newSensor.MaxElevationAngle;
+                //newSensor.ElevationAngle = newSensor.MaxElevationAngle;
             }
             catch (System.IO.IOException)
             {
