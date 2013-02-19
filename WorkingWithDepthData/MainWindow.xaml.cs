@@ -77,6 +77,8 @@ namespace WorkingWithDepthData
         position rightElbow;
         
         position rightHand;
+        position leftHand;
+
         int minDepthLeft = int.MaxValue;
         int minDepthRight = int.MaxValue;
         int prevMinDepthLeft = int.MaxValue;
@@ -168,6 +170,8 @@ namespace WorkingWithDepthData
                 DepthImagePoint headDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
 
                 DepthImagePoint rightHandDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.HandRight].Position);
+                DepthImagePoint leftHandDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.HandLeft].Position);
+
                 DepthImagePoint rightElbowDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.ElbowRight].Position);
 
                 rightElbow.x = rightElbowDepthPoint.X;
@@ -178,6 +182,8 @@ namespace WorkingWithDepthData
 
                 rightHand.x = rightHandDepthPoint.X;
                 rightHand.y = rightHandDepthPoint.Y;
+                leftHand.x = leftHandDepthPoint.X;
+                leftHand.y = leftHandDepthPoint.Y;
 
                 byte[] pixels = GenerateColoredBytes(depthFrame, out leftFingerTips, out rightFingerTips);
 
@@ -337,8 +343,9 @@ namespace WorkingWithDepthData
 
                 if (depth > 0)
                 {
-
-                    if ( pixel.x < head.x)
+                    
+                    //if ( pixel.x < head.x)
+                    if (Math.Abs(pixel.x - leftHand.x) < Math.Abs(pixel.x - rightHand.x))
                     {
                         // Finds the closest depth to sensor - Left
                         minDepthLeft = Math.Min(minDepthLeft, depth);
@@ -396,7 +403,8 @@ namespace WorkingWithDepthData
                 pixel.y = (depthIndex - pixel.x) / numCol;
 
                 // Find minDepth for Left Side
-                if (pixel.x < head.x)
+                //if (pixel.x < head.x)
+                if (Math.Abs(pixel.x - leftHand.x) < Math.Abs(pixel.x - rightHand.x))
                 {
                     minDepth = minDepthLeft;
                     //pixels[colorIndex + BlueIndex] = 0;
@@ -419,7 +427,8 @@ namespace WorkingWithDepthData
                     pixels[colorIndex + RedIndex] = 0;
 
                     // Record Area of Hand
-                    if (pixel.x < head.x)
+                    //if (pixel.x < head.x)
+                    if (Math.Abs(pixel.x - leftHand.x) < Math.Abs(pixel.x - rightHand.x))
                     {
                         leftHandArea++;
                         if (pixelIsOnContour(pixel, rawDepthData))
@@ -583,7 +592,8 @@ namespace WorkingWithDepthData
 
             int depth = rawDepthData[neighborDepthIndex] >> DepthImageFrame.PlayerIndexBitmaskWidth;
             
-            if (pixel.x < head.x)
+            //if (pixel.x < head.x)
+            if (Math.Abs(pixel.x - leftHand.x) < Math.Abs(pixel.x - rightHand.x))
             {
                 minDepth = minDepthLeft;
             }
