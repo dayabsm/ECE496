@@ -44,8 +44,9 @@ namespace WorkingWithDepthData
         //-- added feb 18
         
         Queue<double> right_degrees = new Queue<double>();
-        Queue<double> left_degrees = new Queue<double>();  
-        
+        Queue<double> left_degrees = new Queue<double>();
+
+        const int depthChangeToRegister = 20;
         const double MAX_DEGREE_DEVIATION = 75.0;   //maybe a percentage is more flexible
         const int MAX_QUEUE = 5;    //number of previous degrees to take average
         /*
@@ -64,6 +65,8 @@ namespace WorkingWithDepthData
 
         int numCol;
         int numRows;
+        int rightHandArea;
+        int leftHandArea;
 
         const int skeletonCount = 6;
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
@@ -76,12 +79,19 @@ namespace WorkingWithDepthData
         position rightHand;
         int minDepthLeft = int.MaxValue;
         int minDepthRight = int.MaxValue;
+        int prevMinDepthLeft = int.MaxValue;
+        int prevMinDepthRight = int.MaxValue;
         int minDepth;
-        
+
+        bool isLeftHandOpen = true;
+        bool isRightHandOpen = true;
+
         const float MaxDepthDistance = 4095; // max value returned
         const float MinDepthDistance = 850; // min value returned
         const float MaxDepthDistanceOffset = MaxDepthDistance - MinDepthDistance;
 
+        Queue<int> leftHandAreaQ = new Queue<int>();
+        Queue<int> rightHandAreaQ = new Queue<int>();
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
@@ -136,8 +146,6 @@ namespace WorkingWithDepthData
 
         void newSensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
-            
-
             Skeleton first = GetFirstSkeleton(e);
 
             if (first == null)
@@ -164,8 +172,6 @@ namespace WorkingWithDepthData
 
                 rightElbow.x = rightElbowDepthPoint.X;
                 rightElbow.y = rightElbowDepthPoint.Y;
-
-
 
                 head.x = headDepthPoint.X;
                 head.y = headDepthPoint.Y;
@@ -331,6 +337,7 @@ namespace WorkingWithDepthData
 
                 if (depth > 0)
                 {
+
                     if ( pixel.x < head.x)
                     {
                         // Finds the closest depth to sensor - Left
@@ -345,9 +352,35 @@ namespace WorkingWithDepthData
                 }
             }
 
+            /*if (Math.Abs(minDepthLeft - prevMinDepthLeft) > depthChangeToRegister)
+            {
+                if (minDepthBox.Foreground == Brushes.Red)
+                {
+                    minDepthBox.Foreground = Brushes.Green;
+                }
+                else
+                {
+                    minDepthBox.Foreground = Brushes.Red;
+                }
+            }*/
+
+            prevMinDepthLeft = minDepthLeft;
+            prevMinDepthRight = minDepthRight;
+
+            //int rightHandDepthIndex = (int)(rightHand.y * numCol + rightHand.x);
+            //if (rightHandDepthIndex < 76800)
+            //{
+            //    minDepthRight = rawDepthData[(int)(rightHand.y * numCol + rightHand.x)] >> DepthImageFrame.PlayerIndexBitmaskWidth;
+            //}
+            /*else
+             * {
+             * return???!
+             * }
+             */
             List<position> contourLeft = new List<position>();
             List<position> contourRight = new List<position>();
-
+            leftHandArea = 0;
+            rightHandArea = 0;
             for (int depthIndex = 0, colorIndex = 0;
                 depthIndex < rawDepthData.Length && colorIndex < pixels.Length;
                 depthIndex++, colorIndex += 4)
@@ -378,25 +411,26 @@ namespace WorkingWithDepthData
                 }
 
                 // Give margin for hand - Make sure you copy any changes to 100 to Hand Contour
-                if (((minDepth+ 70) > depth) && (depth >= (minDepth)))
+                if (((minDepth+ 60) > depth) && (depth >= (minDepth)))
                 {
                     // the hand should be blue
                     pixels[colorIndex + BlueIndex] = 255;
                     pixels[colorIndex + GreenIndex] = 0;
                     pixels[colorIndex + RedIndex] = 0;
 
-                    if (pixelIsOnContour(pixel, rawDepthData))
+                    // Record Area of Hand
+                    if (pixel.x < head.x)
                     {
-                        if (pixel.x < head.x)
-                        {
+                        leftHandArea++;
+                        if (pixelIsOnContour(pixel, rawDepthData))
                             contourLeft.Add(pixel);
-                        }
-                        else
-                        {
-                            contourRight.Add(pixel);
-                        }
                     }
-
+                    else
+                    {
+                        rightHandArea++;
+                        if (pixelIsOnContour(pixel, rawDepthData))
+                            contourRight.Add(pixel);
+                    }
                     /*
                     // Calculate distance between pixel's x and y and wrist position
                     if (pixel.x < head.x)
@@ -430,6 +464,47 @@ namespace WorkingWithDepthData
 
                 */    
                 }   
+            }
+
+            leftHandAreaQ.Enqueue(leftHandArea);
+            rightHandAreaQ.Enqueue(rightHandArea);
+
+            // If hand area reduces by 1.5, we have a closed fist
+            if ((isLeftHandOpen && (leftHandAreaQ.Peek()/leftHandArea > 1.5)) || !isLeftHandOpen)
+            {
+                minDepthBox.Foreground = Brushes.Green;
+                isLeftHandOpen = false;
+            }
+
+            // Closed Hand -> Open
+            if (!isLeftHandOpen && (leftHandAreaQ.Peek()/leftHandArea < 0.6) || isLeftHandOpen)
+            {
+                minDepthBox.Foreground = Brushes.Red;
+                isLeftHandOpen = true;
+            }
+
+            if (leftHandAreaQ.Count == 30)
+            {
+                leftHandAreaQ.Dequeue();
+            }
+
+            // If hand area reduces by 1.5, we have a closed fist
+            if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)) || !isRightHandOpen)
+            {
+                minDepthBox.Foreground = Brushes.Green;
+                isRightHandOpen = false;
+            }
+
+            // Closed Hand -> Open
+            if (!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6) || isRightHandOpen)
+            {
+                minDepthBox.Foreground = Brushes.Red;
+                isRightHandOpen = true;
+            }
+
+            if (rightHandAreaQ.Count == 30)
+            {
+                rightHandAreaQ.Dequeue();
             }
 
             // FIX THIS CRAP
@@ -631,6 +706,7 @@ namespace WorkingWithDepthData
         //last change feb 18
         private void Rotate(Image cursor, Image wheel, double angle, int position)
         {
+            // !! Use isLeftHandOpen and isRightHandOpen to detect closed fists!!
             BitmapImage newWheel = new BitmapImage();
             newWheel.BeginInit();
             if (position == 1)
