@@ -1,0 +1,2 @@
+1. Instead of using closest object, use wrist node's depth to find hand contour
+2. Find a way support both hands without dividing in middle. Maybe use position of hand node and create a box around it
