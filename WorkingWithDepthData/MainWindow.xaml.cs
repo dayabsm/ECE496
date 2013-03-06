@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 using System.Diagnostics;
+using System.Media;
 
 using System.Drawing.Drawing2D;
 
@@ -40,20 +41,20 @@ namespace WorkingWithDepthData
     /// </summary>
     ///
     public partial class MainWindow : Window
-    {
-        //-- added feb 18
-        
+    {        
         Queue<double> right_degrees = new Queue<double>();
         Queue<double> left_degrees = new Queue<double>();
 
         const int depthChangeToRegister = 20;
         const double MAX_DEGREE_DEVIATION = 75.0;   //maybe a percentage is more flexible
         const int MAX_QUEUE = 5;    //number of previous degrees to take average
-        /*
-        double[] right_degrees = new double[MAX_QUEUE];
-        double[] left_degrees = new double[MAX_QUEUE];
-        */
-        //--
+
+        Queue<bool> right_palm = new Queue<bool>();
+        Queue<bool> left_palm = new Queue<bool>();
+
+        const int MAX_BOOL = 8;     //look for 4 closed palms, then 4 open palms
+
+        const int OFFSET = 5;
 
         public MainWindow()
         {
@@ -742,24 +743,7 @@ namespace WorkingWithDepthData
             }
             
         }
-
-        //last change feb 18
-        /*
-        private double check_angles(double angle, int position)
-        {
-            if (right_degrees[0] == -999.999) //empty
-            {
-                right_degrees[0] = angle;
-                return angle;
-            }
-            else
-            {
-                //shift array by 1
-                for (x = 0; x < MAX_QUEUE-1; x ++)
-            }
-        }
-         */
-        
+               
         private double check_angles(double angle, int position)
         {
             //return angle;
@@ -845,6 +829,495 @@ namespace WorkingWithDepthData
             {
                 return -999.999;
             }
+        }
+
+        private bool check_palms(int position)
+        {
+            if (position % 2 == 0)    //right palm
+            {
+                if (right_palm.Count >= MAX_BOOL)
+                {
+                    right_palm.Dequeue();
+                    right_palm.Enqueue(isRightHandOpen);
+                }
+                else
+                {
+                    right_palm.Enqueue(isRightHandOpen);
+                    return false;
+                }
+                               
+                if (right_palm.Count >= MAX_BOOL)
+                {
+                    int i = 1;
+                    int flag = 0;
+                    Queue<bool> copyRightPalm = new Queue<bool>(right_palm.ToArray());
+                    foreach (bool current in copyRightPalm)      //looking for pattern of 4 false (palm closed), then 4 true (palm open)
+                    {
+                        if ((i == 1) && (current == false))
+                        {
+                            flag = flag + 1;
+                        }
+                        else if ((i == 2) && (current == false))
+                        {
+                            flag = flag + 2;
+                        }
+                        else if ((i == 3) && (current == false))
+                        {
+                            flag = flag + 3;
+                        }
+                        else if ((i == 4) && (current == false))
+                        {
+                            flag = flag + 4;
+                        }
+                        else if ((i == 5) && (current == true))
+                        {
+                            flag = flag + 5;
+                        }
+                        else if ((i == 6) && (current == true))
+                        {
+                            flag = flag + 6;
+                        }
+                        else if ((i == 7) && (current == true))
+                        {
+                            flag = flag + 7;
+                        }
+                        else if ((i == 8) && (current == true))
+                        {
+                            flag = flag + 8;
+                        }
+                        else
+                        {
+                            flag = flag + 0;
+                        }
+                        i = i + 1;
+                    }
+
+                    if (flag == 36) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+
+                    }
+
+                }
+            }
+            else if (position % 2 == 1)    //left palm
+            {
+                if (left_palm.Count >= MAX_BOOL)
+                {
+                    left_palm.Dequeue();
+                    left_palm.Enqueue(isLeftHandOpen);
+                }
+                else
+                {
+                    left_palm.Enqueue(isLeftHandOpen);
+                    return false;
+                }
+
+                if (left_palm.Count >= MAX_BOOL)
+                {
+                    int i = 1;
+                    int flag = 0;
+                    Queue<bool> copyLeftPalm = new Queue<bool>(left_palm.ToArray());
+                    foreach (bool current in copyLeftPalm)      //looking for pattern of 4 false (palm closed), then 4 true (palm open)
+                    {
+                        if ((i == 1) && (current == false))
+                        {
+                            flag = flag + 1;
+                        }
+                        else if ((i == 2) && (current == false))
+                        {
+                            flag = flag + 2;
+                        }
+                        else if ((i == 3) && (current == false))
+                        {
+                            flag = flag + 3;
+                        }
+                        else if ((i == 4) && (current == false))
+                        {
+                            flag = flag + 4;
+                        }
+                        else if ((i == 5) && (current == true))
+                        {
+                            flag = flag + 5;
+                        }
+                        else if ((i == 6) && (current == true))
+                        {
+                            flag = flag + 6;
+                        }
+                        else if ((i == 7) && (current == true))
+                        {
+                            flag = flag + 7;
+                        }
+                        else if ((i == 8) && (current == true))
+                        {
+                            flag = flag + 8;
+                        }
+                        else
+                        {
+                            flag = flag + 0;
+                        }
+                        i = i + 1;
+                    }
+
+                    if (flag == 36) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+
+                    }
+
+                }
+
+            }
+
+            return false;   //error?
+        }
+
+        private void playAudio(int position, int angle)
+        {
+            int interval = 13;  //every letter has 13 degrees of seperation
+
+            //==============Left Hand Middle Start==================//
+            if ( (position==1)&&(angle>=OFFSET && angle<OFFSET+interval*1) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.z);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*1 && OFFSET+angle<interval*2) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.k);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*2 && OFFSET+angle<interval*3) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.y);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*3 && angle<OFFSET+interval*4) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.m);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*4 && angle<OFFSET+interval*5) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.d);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*5 && angle<OFFSET+interval*6) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.n);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*6 && angle<OFFSET+interval*7) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.e);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*7 && angle<OFFSET+interval*8) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.o);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*8 && angle<OFFSET+interval*9) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.h);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*9 && angle<OFFSET+interval*10) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.u);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*10 && angle<OFFSET+interval*11) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.f);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*11 && angle<OFFSET+interval*12) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.b);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==1)&&(angle>=OFFSET+interval*12 && angle<OFFSET+interval*13) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.x);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            //==============Left Hand Middle End==================//
+
+            //==============Right Hand Middle Start==================//
+            if ( (position==2)&&(angle>=OFFSET && angle<OFFSET+interval*1) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.q);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*1 && OFFSET+angle<interval*2) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.v);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*2 && OFFSET+angle<interval*3) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.g);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*3 && angle<OFFSET+interval*4) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.c);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*4 && angle<OFFSET+interval*5) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.r);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*5 && angle<OFFSET+interval*6) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.i);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*6 && angle<OFFSET+interval*7) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.t);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*7 && angle<OFFSET+interval*8) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.a);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*8 && angle<OFFSET+interval*9) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.s);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*9 && angle<OFFSET+interval*10) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.l);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*10 && angle<OFFSET+interval*11) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.w);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*11 && angle<OFFSET+interval*12) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.p);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            if ( (position==2)&&(angle>=OFFSET+interval*12 && angle<OFFSET+interval*13) )
+            {
+                try
+                {
+                    SoundPlayer audio = new SoundPlayer(Properties.Resources.j);
+                    audio.Play();
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
+            }
+            //==============Right Hand Middle End==================//
+
+            //==============Left Hand Low Start==================//
+            //insert in here when need to change
+            //==============Left Hand Low End==================//
+
+            //==============Right Hand Low Start==================//
+            //insert in here when need to change
+            //==============Right Hand Low End==================//
+
+            //==============Left Hand High Start==================//
+            //insert in here when need to change
+            //==============Left Hand High End==================//
+
+            //==============Right Hand High Start==================//
+            //insert in here when need to change
+            //==============Right Hand High End==================//
+
         }
         
         private void enableTestUI_Click(object sender, RoutedEventArgs e)

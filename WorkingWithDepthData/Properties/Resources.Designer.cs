@@ -59,5 +59,389 @@ namespace WorkingWithDepthData.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.IO.UnmanagedMemoryStream _0 {
+            get {
+                return ResourceManager.GetStream("_0", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _1 {
+            get {
+                return ResourceManager.GetStream("_1", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _2 {
+            get {
+                return ResourceManager.GetStream("_2", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _3 {
+            get {
+                return ResourceManager.GetStream("_3", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _4 {
+            get {
+                return ResourceManager.GetStream("_4", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _5 {
+            get {
+                return ResourceManager.GetStream("_5", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _6 {
+            get {
+                return ResourceManager.GetStream("_6", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _7 {
+            get {
+                return ResourceManager.GetStream("_7", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _8 {
+            get {
+                return ResourceManager.GetStream("_8", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream _9 {
+            get {
+                return ResourceManager.GetStream("_9", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream a {
+            get {
+                return ResourceManager.GetStream("a", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream Ampersand {
+            get {
+                return ResourceManager.GetStream("Ampersand", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream Asterisk {
+            get {
+                return ResourceManager.GetStream("Asterisk", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream at {
+            get {
+                return ResourceManager.GetStream("at", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream b {
+            get {
+                return ResourceManager.GetStream("b", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream backslash {
+            get {
+                return ResourceManager.GetStream("backslash", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream backspace {
+            get {
+                return ResourceManager.GetStream("backspace", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream c {
+            get {
+                return ResourceManager.GetStream("c", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream caret {
+            get {
+                return ResourceManager.GetStream("caret", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream close_bracket {
+            get {
+                return ResourceManager.GetStream("close_bracket", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream colon {
+            get {
+                return ResourceManager.GetStream("colon", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream comma {
+            get {
+                return ResourceManager.GetStream("comma", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream confirm {
+            get {
+                return ResourceManager.GetStream("confirm", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream d {
+            get {
+                return ResourceManager.GetStream("d", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream down {
+            get {
+                return ResourceManager.GetStream("down", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream e {
+            get {
+                return ResourceManager.GetStream("e", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream enter {
+            get {
+                return ResourceManager.GetStream("enter", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream equal {
+            get {
+                return ResourceManager.GetStream("equal", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream exclamation {
+            get {
+                return ResourceManager.GetStream("exclamation", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream f {
+            get {
+                return ResourceManager.GetStream("f", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream forwardslash {
+            get {
+                return ResourceManager.GetStream("forwardslash", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream g {
+            get {
+                return ResourceManager.GetStream("g", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream h {
+            get {
+                return ResourceManager.GetStream("h", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream i {
+            get {
+                return ResourceManager.GetStream("i", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream j {
+            get {
+                return ResourceManager.GetStream("j", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream k {
+            get {
+                return ResourceManager.GetStream("k", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream l {
+            get {
+                return ResourceManager.GetStream("l", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream left {
+            get {
+                return ResourceManager.GetStream("left", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream m {
+            get {
+                return ResourceManager.GetStream("m", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream minus {
+            get {
+                return ResourceManager.GetStream("minus", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream money {
+            get {
+                return ResourceManager.GetStream("money", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream n {
+            get {
+                return ResourceManager.GetStream("n", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream o {
+            get {
+                return ResourceManager.GetStream("o", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream open_bracket {
+            get {
+                return ResourceManager.GetStream("open_bracket", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream p {
+            get {
+                return ResourceManager.GetStream("p", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream percent {
+            get {
+                return ResourceManager.GetStream("percent", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream period {
+            get {
+                return ResourceManager.GetStream("period", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream plus {
+            get {
+                return ResourceManager.GetStream("plus", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream pound {
+            get {
+                return ResourceManager.GetStream("pound", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream q {
+            get {
+                return ResourceManager.GetStream("q", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream question_mark {
+            get {
+                return ResourceManager.GetStream("question_mark", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream r {
+            get {
+                return ResourceManager.GetStream("r", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream right {
+            get {
+                return ResourceManager.GetStream("right", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream s {
+            get {
+                return ResourceManager.GetStream("s", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream semicolon {
+            get {
+                return ResourceManager.GetStream("semicolon", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream space {
+            get {
+                return ResourceManager.GetStream("space", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream t {
+            get {
+                return ResourceManager.GetStream("t", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream u {
+            get {
+                return ResourceManager.GetStream("u", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream up {
+            get {
+                return ResourceManager.GetStream("up", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream v {
+            get {
+                return ResourceManager.GetStream("v", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream w {
+            get {
+                return ResourceManager.GetStream("w", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream x {
+            get {
+                return ResourceManager.GetStream("x", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream y {
+            get {
+                return ResourceManager.GetStream("y", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream z {
+            get {
+                return ResourceManager.GetStream("z", resourceCulture);
+            }
+        }
     }
 }
