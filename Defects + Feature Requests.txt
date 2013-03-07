@@ -1,7 +1,5 @@
 1. Instead of using closest object, use wrist node's depth to find hand contour. Proposed solution: Ignore blobs not at extremes
-2. Fixed: Find a way support both hands without dividing in middle. Maybe use position of hand node and create a box around it
 3. Allow detection of closed fist
-4. Allow for use only using one hand
 
 Daya
 - Include support for THREE positions

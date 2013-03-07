@@ -247,7 +247,16 @@ namespace WorkingWithDepthData
                 textBoxLeft.Text = angle.ToString("#.##") + "°";
                 //offset -> need to adjust probably
                 angle = angle - 90;
-                Rotate(cursorLeft, wheelLeft, angle, position);
+
+                if (first.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred)
+                {
+                    // TODO: Handle the case where hand is not being used - what do we want to show in GUI?
+                }
+
+                else
+                {
+                    Rotate(cursorLeft, wheelLeft, angle, position);
+                }
 
                 if (rightWrist.y < head.y)
                 {
@@ -263,9 +272,25 @@ namespace WorkingWithDepthData
                 textBoxRight.Text = angle.ToString("#.##") + "°";
                 //offset -> need to adjust probably
                 angle = angle - 90;
-                Rotate(cursorRight, wheelRight, angle, position);
 
-                minDepthBox.Text = "Left Angle: " + angleValLeft + " Right Angle: " + angleValRight;
+                
+
+                if (first.Joints[JointType.HandRight].TrackingState == JointTrackingState.Inferred)
+                {
+                    // TODO: Handle the case where hand is not being used - what do we want to show in GUI?
+                    minDepthBox.Text = "Hidden";
+                }
+
+                else
+                {
+                    minDepthBox.Text = "Left Angle: " + angleValLeft + " Right Angle: " + angleValRight;
+                    Rotate(cursorRight, wheelRight, angle, position);
+                }
+
+                
+
+
+               
 
                 //create image
                 image1.Source =
@@ -389,6 +414,17 @@ namespace WorkingWithDepthData
             List<position> contourRight = new List<position>();
             leftHandArea = 0;
             rightHandArea = 0;
+
+            // Variables to remove body blob
+            bool leftBlobFound = false;
+            bool rightBlobFound = false;
+            bool leftCaptureDone = false;
+            bool rightCaptureDone = false;
+        
+            float lastYIndex_left = 0;
+            float lastYIndex_right = 0;
+
+
             for (int depthIndex = 0, colorIndex = 0;
                 depthIndex < rawDepthData.Length && colorIndex < pixels.Length;
                 depthIndex++, colorIndex += 4)
@@ -403,14 +439,11 @@ namespace WorkingWithDepthData
                 pixel.x = depthIndex % numCol;
                 pixel.y = (depthIndex - pixel.x) / numCol;
 
-                // Find minDepth for Left Side
-                //if (pixel.x < head.x)
+               
                 if (Math.Abs(pixel.x - leftHand.x) < Math.Abs(pixel.x - rightHand.x))
+                // Depending on which side it is, choose the appropriate minDepth
                 {
                     minDepth = minDepthLeft;
-                    //pixels[colorIndex + BlueIndex] = 0;
-                    //pixels[colorIndex + GreenIndex] = 0;
-                    //pixels[colorIndex + RedIndex] = 0;
                 }
 
                 else
@@ -420,6 +453,7 @@ namespace WorkingWithDepthData
                 }
 
                 // Give margin for hand - Make sure you copy any changes to 100 to Hand Contour
+                // Need to also make sure that all points are in the same blob as the hand node
                 if (((minDepth+ 60) > depth) && (depth >= (minDepth)))
                 {
                     // the hand should be blue
@@ -428,51 +462,69 @@ namespace WorkingWithDepthData
                     pixels[colorIndex + RedIndex] = 0;
 
                     // Record Area of Hand
-                    //if (pixel.x < head.x)
                     if (Math.Abs(pixel.x - leftHand.x) < Math.Abs(pixel.x - rightHand.x))
                     {
-                        leftHandArea++;
-                        if (pixelIsOnContour(pixel, rawDepthData))
-                            contourLeft.Add(pixel);
+                        // We've found the first instance of the left hand
+                        leftBlobFound = true;
+
+                        if (!leftCaptureDone)
+                        {
+                            pixels[colorIndex + BlueIndex] = 255;
+                            pixels[colorIndex + GreenIndex] = 0;
+                            pixels[colorIndex + RedIndex] = 255;
+
+                            leftHandArea++;
+                            lastYIndex_left = pixel.y;
+                            if (pixelIsOnContour(pixel, rawDepthData))
+                            {
+                                leftBlobFound = true;
+                                contourLeft.Add(pixel);
+                            }
+
+                            
+                            //// else if an entire row has no hand pixels, we have to stop
+                            //if (leftBlobFound && (pixel.y > lastYIndex_left))
+                            //{
+                            //    // we are done capturing left blob
+                            //    leftCaptureDone = true;
+                            //}
+                        }
+
                     }
                     else
                     {
-                        rightHandArea++;
-                        if (pixelIsOnContour(pixel, rawDepthData))
-                            contourRight.Add(pixel);
-                    }
-                    /*
-                    // Calculate distance between pixel's x and y and wrist position
-                    if (pixel.x < head.x)
-                    {
-                        // First Condition checks whether the pixel the pixel being checked is over the wrist (lower y coordinate)
-                        if (pixel.y < leftWrist.y && findDistance(pixel, leftWrist) > distanceLeft)
+                        if (!rightCaptureDone)
                         {
-                            // Left Hand
-                            leftFingerTip.x = pixel.x;
-                            leftFingerTip.y = pixel.y;
-                            distanceLeft = findDistance(pixel, leftWrist);
-                            pixels[colorIndex + BlueIndex] = 0;
+                            pixels[colorIndex + BlueIndex] = 255;
                             pixels[colorIndex + GreenIndex] = 0;
                             pixels[colorIndex + RedIndex] = 255;
+                            rightHandArea++;
+                            lastYIndex_right = pixel.y;
+                            if (pixelIsOnContour(pixel, rawDepthData))
+                            {
+                                // Keep track of largest minimum value
+                                rightBlobFound = true;
+                                contourRight.Add(pixel);
+                                
+                            }
+                            //// we have reached a pixel which is 10 indices away from the previous contour point
+                            //else if (rightBlobFound && (pixel.y > lastYIndex_right + 10))
+                            //{
+                            //    // we are done capturing right blob
+                            //    rightCaptureDone = true;
+                            //}
                         }
                     }
+                }
 
-                    else
-                    {
-                        if (pixel.y < rightWrist.y && findDistance(pixel, rightWrist) > distanceRight)
-                        {
-                            // Right Hand
-                            rightFingerTip.x = pixel.x;
-                            rightFingerTip.y = pixel.y;
-                            distanceRight = findDistance(pixel, rightWrist);
-                            pixels[colorIndex + BlueIndex] = 0;
-                            pixels[colorIndex + GreenIndex] = 0;
-                            pixels[colorIndex + RedIndex] = 255;
-                        }
-                    }
-
-                */    
+                // Once we reach the end of every row
+                if (pixel.x >= numCol - 1)
+                {
+                    //Check if we found any new hand points in this row
+                    if (leftBlobFound && lastYIndex_left < pixel.y)
+                        leftCaptureDone = true;
+                    if (rightBlobFound && lastYIndex_right < pixel.y)
+                        rightCaptureDone = true;
                 }   
             }
 
@@ -480,41 +532,50 @@ namespace WorkingWithDepthData
             rightHandAreaQ.Enqueue(rightHandArea);
 
             // If hand area reduces by 1.5, we have a closed fist
-            if ((isLeftHandOpen && (leftHandAreaQ.Peek()/leftHandArea > 1.5)) || !isLeftHandOpen)
+            try
             {
-                minDepthBox.Foreground = Brushes.Green;
-                isLeftHandOpen = false;
+                if ((isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea > 1.5)) || !isLeftHandOpen)
+                {
+                    //minDepthBox.Foreground = Brushes.Green;
+                    isLeftHandOpen = false;
+                }
+
+                // Closed Hand -> Open
+                if ((!isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea < 0.6)) || isLeftHandOpen)
+                {
+                    //minDepthBox.Foreground = Brushes.Red;
+                    isLeftHandOpen = true;
+                }
+
+                if (leftHandAreaQ.Count == 30)
+                {
+                    leftHandAreaQ.Dequeue();
+                }
+
+                // If hand area reduces by 1.5, we have a closed fist
+                if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)) || !isRightHandOpen)
+                {
+                    minDepthBox.Foreground = Brushes.Green;
+                    isRightHandOpen = false;
+                }
+
+                // Closed Hand -> Open
+                if ((!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6)) || isRightHandOpen)
+                {
+                    minDepthBox.Foreground = Brushes.Red;
+                    isRightHandOpen = true;
+                }
+
+                if (rightHandAreaQ.Count == 30)
+                {
+                    rightHandAreaQ.Dequeue();
+                }
             }
 
-            // Closed Hand -> Open
-            if (!isLeftHandOpen && (leftHandAreaQ.Peek()/leftHandArea < 0.6) || isLeftHandOpen)
+            catch (DivideByZeroException e)
             {
-                minDepthBox.Foreground = Brushes.Red;
-                isLeftHandOpen = true;
-            }
-
-            if (leftHandAreaQ.Count == 30)
-            {
-                leftHandAreaQ.Dequeue();
-            }
-
-            // If hand area reduces by 1.5, we have a closed fist
-            if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)) || !isRightHandOpen)
-            {
-                minDepthBox.Foreground = Brushes.Green;
-                isRightHandOpen = false;
-            }
-
-            // Closed Hand -> Open
-            if (!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6) || isRightHandOpen)
-            {
-                minDepthBox.Foreground = Brushes.Red;
-                isRightHandOpen = true;
-            }
-
-            if (rightHandAreaQ.Count == 30)
-            {
-                rightHandAreaQ.Dequeue();
+                // New Area is equal to zero
+                // Make no changes
             }
 
             // FIX THIS CRAP
