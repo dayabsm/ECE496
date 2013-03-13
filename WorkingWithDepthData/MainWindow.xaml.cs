@@ -45,6 +45,12 @@ namespace WorkingWithDepthData
         Queue<double> right_degrees = new Queue<double>();
         Queue<double> left_degrees = new Queue<double>();
 
+        bool right_pressed = false;
+        bool left_pressed = false;
+
+        Queue<int> previous_right_degrees = new Queue<int>();
+        Queue<int> previous_left_degrees = new Queue<int>();
+
         const int depthChangeToRegister = 20;
         const double MAX_DEGREE_DEVIATION = 75.0;   //maybe a percentage is more flexible
         const int MAX_QUEUE = 5;    //number of previous degrees to take average
@@ -245,7 +251,7 @@ namespace WorkingWithDepthData
 
                 double angle = angleValLeft;
 
-                textBoxLeft.Text = angle.ToString("#.##") + "°";
+                //textBoxLeft.Text = angle.ToString("#.##") + "°";
                 //offset -> need to adjust probably
                 angle = angle - 90;
 
@@ -270,7 +276,7 @@ namespace WorkingWithDepthData
                 }
 
                 angle = angleValRight;
-                textBoxRight.Text = angle.ToString("#.##") + "°";
+                //textBoxRight.Text = angle.ToString("#.##") + "°";
                 //offset -> need to adjust probably
                 angle = angle - 90;
 
@@ -780,7 +786,6 @@ namespace WorkingWithDepthData
             Rotate(cursorRight, wheelRight, angle, position);
         }
 
-        //last change feb 18
         private void Rotate(Image cursor, Image wheel, double angle, int position)
         {
             BitmapImage newWheel = new BitmapImage();
@@ -818,17 +823,76 @@ namespace WorkingWithDepthData
             else if (position == 6)
                 newWheel = new Bitmap(Properties.Resources.right_high);
             */
+
             bool new_palm = check_palms(position);
 
-            //if (new_palm == true)
+            bool current_palm = false;
+            if (position % 2 == 0)
+                current_palm = isRightHandOpen;
+            else
+                current_palm = isLeftHandOpen;
+
+            if (current_palm == true)   //if palm is open, check the angle and rotate
             {
                 double new_angle = check_angles(angle, position);
                 if (new_angle != -999.999)
                 {
                     double rounded_angle = Math.Round(new_angle, 0);
                     cursor.RenderTransform = new RotateTransform(rounded_angle);
+
+                    if (position % 2 == 0)
+                    {
+                        if (previous_right_degrees.Count >= MAX_BOOL)
+                        {
+                            previous_right_degrees.Dequeue();
+                            previous_right_degrees.Enqueue((int)rounded_angle + 90);
+                        }
+                        else
+                        {
+                            previous_right_degrees.Enqueue((int)rounded_angle + 90);
+                        }
+                    }
+                    else
+                    {
+                        if (previous_left_degrees.Count >= MAX_BOOL)
+                        {
+                            previous_left_degrees.Dequeue();
+                            previous_left_degrees.Enqueue((int)rounded_angle + 90);
+                        }
+                        else
+                        {
+                            previous_left_degrees.Enqueue((int)rounded_angle + 90);
+                        }
+                    }
+
                     //playAudio(position, rounded_angle);
-                    playAudio(position, (int)rounded_angle + 90);
+                    //playAudio(position, (int)rounded_angle + 90);        
+                    if (position % 2 == 0)
+                    {
+                        if (previous_right_degrees.Count > 0)
+                            playAudio(position, previous_right_degrees.Peek());
+                        else
+                            playAudio(position, (int)rounded_angle + 90);
+
+                        if (right_pressed == true)
+                        {
+                            //insert letter
+                            right_pressed = false;
+                        }
+                    }
+                    else
+                    {
+                        if (previous_left_degrees.Count > 0)
+                            playAudio(position, previous_left_degrees.Peek());
+                        else
+                            playAudio(position, (int)rounded_angle + 90);
+
+                        if (left_pressed == true)
+                        {
+                            //insert letter
+                            left_pressed = false;
+                        }
+                    }
                 }
             }
             
@@ -999,10 +1063,12 @@ namespace WorkingWithDepthData
                         i = i + 1;
                     }
                     labelRightFlag.Content = flag.ToString();
-                    if (flag == 36) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
+                    if (flag == 10) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
                     {
+                        
                         SoundPlayer audio = new SoundPlayer(Properties.Resources.confirm);
                         audio.Play();
+                        right_pressed = true;
                         return true;
                     }
                     else
@@ -1073,10 +1139,11 @@ namespace WorkingWithDepthData
                     }
                     labelLeftFlag.Content = flag.ToString();
 
-                    if (flag == 36) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
+                    if (flag == 10) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
                     {
                         SoundPlayer audio = new SoundPlayer(Properties.Resources.confirm);
                         audio.Play();
+                        left_pressed = true;
                         return true;
                     }
                     else
@@ -1092,88 +1159,90 @@ namespace WorkingWithDepthData
             return false;   //error?
         }
 
-        private void playAudio(int position, int angle)
+        private string playAudio(int position, int angle)
         {
             int interval = 13;  //every letter has 13 degrees of seperation
             SoundPlayer audio;
+            string return_letter = "";
             audio = new SoundPlayer(Properties.Resources.confirm);  //set to something to just make it compile
             //==============Left Hand Middle Start==================//
             if ((position == 1) && (angle >= OFFSET && angle < OFFSET + interval * 1))
             {
                 textBoxLeft.Text = "z";
-                audio = new SoundPlayer(Properties.Resources.z);                
+                audio = new SoundPlayer(Properties.Resources.z);
+                return_letter = "z";
             }
             if ((position == 1) && ((angle >= OFFSET + interval * 1) && angle < OFFSET + interval * 2))
             {
                 textBoxLeft.Text = "k";
                 audio = new SoundPlayer(Properties.Resources.k);
-                
+                return_letter = "k";                
             }
             if ((position == 1) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
                 textBoxLeft.Text = "y";
                 audio = new SoundPlayer(Properties.Resources.y);
-                
+                return_letter = "y";                
             }
             if ((position == 1) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
                 textBoxLeft.Text = "m";
                 audio = new SoundPlayer(Properties.Resources.m);
-                
+                return_letter = "m";                 
             }
             if ((position == 1) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
                 textBoxLeft.Text = "d";
                 audio = new SoundPlayer(Properties.Resources.d);
-                
+                return_letter = ""; 
             }
             if ((position == 1) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
                 textBoxLeft.Text = "n";
                 audio = new SoundPlayer(Properties.Resources.n);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
                 textBoxLeft.Text = "e";
                 audio = new SoundPlayer(Properties.Resources.e);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
                 textBoxLeft.Text = "o";
                 audio = new SoundPlayer(Properties.Resources.o);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
                 textBoxLeft.Text = "h";
                 audio = new SoundPlayer(Properties.Resources.h);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
                 textBoxLeft.Text = "u";
                 audio = new SoundPlayer(Properties.Resources.u);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
                 textBoxLeft.Text = "f";
                 audio = new SoundPlayer(Properties.Resources.f);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
                 textBoxLeft.Text = "b";
                 audio = new SoundPlayer(Properties.Resources.b);
-                
+                return_letter = "";
             }
             if ((position == 1) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
                 textBoxLeft.Text = "z";
                 audio = new SoundPlayer(Properties.Resources.x);
-                
+                return_letter = "";
             }
             //==============Left Hand Middle End==================//
 
@@ -1182,79 +1251,79 @@ namespace WorkingWithDepthData
             {
                 textBoxRight.Text = "q";
                 audio = new SoundPlayer(Properties.Resources.q);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 1 &&  angle < OFFSET + interval * 2))
             {
                 textBoxRight.Text = "v";
                 audio = new SoundPlayer(Properties.Resources.v);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
                 textBoxRight.Text = "g";
                 audio = new SoundPlayer(Properties.Resources.g);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
                 textBoxRight.Text = "c";
                 audio = new SoundPlayer(Properties.Resources.c);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
                 textBoxRight.Text = "r";
                 audio = new SoundPlayer(Properties.Resources.r);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
                 textBoxRight.Text = "i";
                 audio = new SoundPlayer(Properties.Resources.i);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
                 textBoxRight.Text = "t";
                 audio = new SoundPlayer(Properties.Resources.t);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
                 textBoxRight.Text = "a";
                 audio = new SoundPlayer(Properties.Resources.a);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
                 textBoxRight.Text = "s";
                 audio = new SoundPlayer(Properties.Resources.s);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
                 textBoxRight.Text = "l";
                 audio = new SoundPlayer(Properties.Resources.l);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
                 textBoxRight.Text = "w";
                 audio = new SoundPlayer(Properties.Resources.w);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
                 textBoxRight.Text = "p";
                 audio = new SoundPlayer(Properties.Resources.p);
-                
+                return_letter = "";
             }
             if ((position == 2) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
                 textBoxRight.Text = "j";
                 audio = new SoundPlayer(Properties.Resources.j);
-                
+                return_letter = "";
             }
             //==============Right Hand Middle End==================//
 
@@ -1263,79 +1332,79 @@ namespace WorkingWithDepthData
             {
                 textBoxLeft.Text = "(";
                 audio = new SoundPlayer(Properties.Resources.open_bracket);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
             {
                 textBoxLeft.Text = "0";
                 audio = new SoundPlayer(Properties.Resources._0);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
                 textBoxLeft.Text = "1";
                 audio = new SoundPlayer(Properties.Resources._1);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
                 textBoxLeft.Text = "2";
                 audio = new SoundPlayer(Properties.Resources._2);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
                 textBoxLeft.Text = "3";
                 audio = new SoundPlayer(Properties.Resources._3);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
                 textBoxLeft.Text = "4";
                 audio = new SoundPlayer(Properties.Resources._4);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
                 textBoxLeft.Text = "space";
                 audio = new SoundPlayer(Properties.Resources.space);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
                 textBoxLeft.Text = "5";
                 audio = new SoundPlayer(Properties.Resources._5);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
                 textBoxLeft.Text = "6";
                 audio = new SoundPlayer(Properties.Resources._6);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
                 textBoxLeft.Text = "7";
                 audio = new SoundPlayer(Properties.Resources._7);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
                 textBoxLeft.Text = "8";
                 audio = new SoundPlayer(Properties.Resources._8);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
                 textBoxLeft.Text = "9";
                 audio = new SoundPlayer(Properties.Resources._9);
-                
+                return_letter = "";
             }
             if ((position == 3) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
                 textBoxLeft.Text = ")";
                 audio = new SoundPlayer(Properties.Resources.close_bracket);
-                
+                return_letter = "";
             }
             //==============Left Hand Low End==================//
 
@@ -1344,79 +1413,79 @@ namespace WorkingWithDepthData
             {
                 textBoxRight.Text = "`";
                 audio = new SoundPlayer(Properties.Resources.graveaccent);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
             {
                 textBoxRight.Text = "&";
                 audio = new SoundPlayer(Properties.Resources.Ampersand);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
                 textBoxRight.Text = "$";
                 audio = new SoundPlayer(Properties.Resources.money);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
                 textBoxRight.Text = "!";
                 audio = new SoundPlayer(Properties.Resources.exclamation);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
                 textBoxRight.Text = ":";
                 audio = new SoundPlayer(Properties.Resources.colon);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
                 textBoxRight.Text = "@";
                 audio = new SoundPlayer(Properties.Resources.at);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
                 textBoxRight.Text = "Enter";
                 audio = new SoundPlayer(Properties.Resources.enter);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
                 textBoxRight.Text = "←";
                 audio = new SoundPlayer(Properties.Resources.backspace);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
                 textBoxRight.Text = ",";
                 audio = new SoundPlayer(Properties.Resources.comma);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
                 textBoxRight.Text = "#";
                 audio = new SoundPlayer(Properties.Resources.pound);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
                 textBoxRight.Text = "%";
                 audio = new SoundPlayer(Properties.Resources.percent);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
                 textBoxRight.Text = "-";
                 audio = new SoundPlayer(Properties.Resources.minus);
-                
+                return_letter = "";
             }
             if ((position == 4) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
                 textBoxRight.Text = "/";
                 audio = new SoundPlayer(Properties.Resources.backslash);
-                
+                return_letter = "";
             }
             //==============Right Hand Low End==================//
 
@@ -1425,79 +1494,79 @@ namespace WorkingWithDepthData
             {
                 textBoxLeft.Text = "~";
                 audio = new SoundPlayer(Properties.Resources.tilde);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
             {
                 textBoxLeft.Text = "^";
                 audio = new SoundPlayer(Properties.Resources.carrot);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
                 textBoxLeft.Text = "*";
                 audio = new SoundPlayer(Properties.Resources.star);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
                 textBoxLeft.Text = "_";
                 audio = new SoundPlayer(Properties.Resources.underscore);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
                 textBoxLeft.Text = "Left";
                 audio = new SoundPlayer(Properties.Resources.left);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
                 textBoxLeft.Text = "Up";
                 audio = new SoundPlayer(Properties.Resources.up);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
                 textBoxLeft.Text = "Space";
                 audio = new SoundPlayer(Properties.Resources.space);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
                 textBoxLeft.Text = "Down";
                 audio = new SoundPlayer(Properties.Resources.down);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
                 textBoxLeft.Text = "Right";
                 audio = new SoundPlayer(Properties.Resources.right);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
                 textBoxLeft.Text = "+";
                 audio = new SoundPlayer(Properties.Resources.plus);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
                 textBoxLeft.Text = "=";
                 audio = new SoundPlayer(Properties.Resources.equal);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
                 textBoxLeft.Text = ";";
                 audio = new SoundPlayer(Properties.Resources.semicolon);
-                
+                return_letter = "";
             }
             if ((position == 5) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
                 textBoxLeft.Text = "\\";
                 audio = new SoundPlayer(Properties.Resources.forwardslash);
-                
+                return_letter = "";
             }
             //==============Left Hand High End==================//
 
@@ -1506,82 +1575,82 @@ namespace WorkingWithDepthData
             {
                 textBoxRight.Text = "[";
                 audio = new SoundPlayer(Properties.Resources.squarebracket);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
             {
                 textBoxRight.Text = "{";
                 audio = new SoundPlayer(Properties.Resources.curlybracket);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
                 textBoxRight.Text = "<";
                 audio = new SoundPlayer(Properties.Resources.lessthan);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
                 textBoxRight.Text = "\"";
                 audio = new SoundPlayer(Properties.Resources.quote);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
                 textBoxRight.Text = "Home";
                 audio = new SoundPlayer(Properties.Resources.home);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
                 textBoxRight.Text = "PgUp";
                 audio = new SoundPlayer(Properties.Resources.pgup);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
                 textBoxRight.Text = "Enter";
                 audio = new SoundPlayer(Properties.Resources.enter);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
                 textBoxRight.Text = "PgDn";
                 audio = new SoundPlayer(Properties.Resources.pgdn);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
                 textBoxRight.Text = "End";
                 audio = new SoundPlayer(Properties.Resources.end);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
                 textBoxRight.Text = "?";
                 audio = new SoundPlayer(Properties.Resources.question_mark);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
                 textBoxRight.Text = ">";
                 audio = new SoundPlayer(Properties.Resources.greaterthan);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
                 textBoxRight.Text = "}";
                 audio = new SoundPlayer(Properties.Resources.curlybracket);
-                
+                return_letter = "";
             }
             if ((position == 6) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
                 textBoxRight.Text = "]";
                 audio = new SoundPlayer(Properties.Resources.squarebracket);
-                
+                return_letter = "";
             }
             //==============Right Hand High End==================//
-
+            /*
             try
             {
                 if (checkBoxSound.IsChecked == true)
@@ -1590,8 +1659,8 @@ namespace WorkingWithDepthData
             catch
             {
                 //do nothing
-            }
-
+            }*/
+            return return_letter;
         }
         
         private void enableTestUI_Click(object sender, RoutedEventArgs e)
