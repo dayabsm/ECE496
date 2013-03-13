@@ -105,105 +105,253 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\cursor2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\layout1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\layout2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\layout3.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\layout4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\layout1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\layout2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\layout3.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\layout4.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Sounds\0.wav" />
-    <EmbeddedResource Include="Sounds\1.wav" />
-    <EmbeddedResource Include="Sounds\2.wav" />
-    <EmbeddedResource Include="Sounds\3.wav" />
-    <EmbeddedResource Include="Sounds\4.wav" />
-    <EmbeddedResource Include="Sounds\5.wav" />
-    <EmbeddedResource Include="Sounds\6.wav" />
-    <EmbeddedResource Include="Sounds\7.wav" />
-    <EmbeddedResource Include="Sounds\8.wav" />
-    <EmbeddedResource Include="Sounds\9.wav" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Sounds\a.wav" />
-    <EmbeddedResource Include="Sounds\Ampersand.wav" />
-    <EmbeddedResource Include="Sounds\Asterisk.wav" />
-    <EmbeddedResource Include="Sounds\at.wav" />
-    <EmbeddedResource Include="Sounds\b.wav" />
-    <EmbeddedResource Include="Sounds\backslash.wav" />
-    <EmbeddedResource Include="Sounds\backspace.wav" />
-    <EmbeddedResource Include="Sounds\c.wav" />
-    <EmbeddedResource Include="Sounds\caret.wav" />
-    <EmbeddedResource Include="Sounds\close bracket.wav" />
-    <EmbeddedResource Include="Sounds\colon.wav" />
-    <EmbeddedResource Include="Sounds\comma.wav" />
-    <EmbeddedResource Include="Sounds\confirm.wav" />
-    <EmbeddedResource Include="Sounds\d.wav" />
-    <EmbeddedResource Include="Sounds\down.wav" />
-    <EmbeddedResource Include="Sounds\e.wav" />
-    <EmbeddedResource Include="Sounds\enter.wav" />
-    <EmbeddedResource Include="Sounds\equal.wav" />
-    <EmbeddedResource Include="Sounds\exclamation.wav" />
-    <EmbeddedResource Include="Sounds\f.wav" />
-    <EmbeddedResource Include="Sounds\forwardslash.wav" />
-    <EmbeddedResource Include="Sounds\g.wav" />
-    <EmbeddedResource Include="Sounds\h.wav" />
-    <EmbeddedResource Include="Sounds\i.wav" />
-    <EmbeddedResource Include="Sounds\j.wav" />
-    <EmbeddedResource Include="Sounds\k.wav" />
-    <EmbeddedResource Include="Sounds\l.wav" />
-    <EmbeddedResource Include="Sounds\left.wav" />
-    <EmbeddedResource Include="Sounds\m.wav" />
-    <EmbeddedResource Include="Sounds\minus.wav" />
-    <EmbeddedResource Include="Sounds\money.wav" />
-    <EmbeddedResource Include="Sounds\n.wav" />
-    <EmbeddedResource Include="Sounds\o.wav" />
-    <EmbeddedResource Include="Sounds\open bracket.wav" />
-    <EmbeddedResource Include="Sounds\p.wav" />
-    <EmbeddedResource Include="Sounds\percent.wav" />
-    <EmbeddedResource Include="Sounds\period.wav" />
-    <EmbeddedResource Include="Sounds\plus.wav" />
-    <EmbeddedResource Include="Sounds\pound.wav" />
-    <EmbeddedResource Include="Sounds\q.wav" />
-    <EmbeddedResource Include="Sounds\question mark.wav" />
-    <EmbeddedResource Include="Sounds\r.wav" />
-    <EmbeddedResource Include="Sounds\right.wav" />
-    <EmbeddedResource Include="Sounds\s.wav" />
-    <EmbeddedResource Include="Sounds\semicolon.wav" />
-    <EmbeddedResource Include="Sounds\space.wav" />
-    <EmbeddedResource Include="Sounds\t.wav" />
-    <EmbeddedResource Include="Sounds\u.wav" />
-    <EmbeddedResource Include="Sounds\up.wav" />
-    <EmbeddedResource Include="Sounds\v.wav" />
-    <EmbeddedResource Include="Sounds\w.wav" />
-    <EmbeddedResource Include="Sounds\x.wav" />
-    <EmbeddedResource Include="Sounds\y.wav" />
-    <EmbeddedResource Include="Sounds\z.wav" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Dependencies\KinectWpfViewers\Microsoft.Samples.Kinect.WpfViewers.csproj">
       <Project>{4de23893-27e7-423f-9bb6-ba21dac2c45e}</Project>
       <Name>Microsoft.Samples.Kinect.WpfViewers</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\0.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\2.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\4.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\5.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\6.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\7.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\8.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\9.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\a.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Ampersand.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Asterisk.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\at.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\b.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\backslash.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\backspace.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\c.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\caret.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\carrot.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\close bracket.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\colon.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\comma.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\confirm.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\curlybracket.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\d.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\down.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\e.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\end.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\enter.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\equal.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exclamation.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\f.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\forwardslash.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\g.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\graveaccent.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\greaterthan.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\h.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\home.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\i.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\j.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\k.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\l.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\left.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\lessthan.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\m.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minus.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\money.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\n.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\o.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\open bracket.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\p.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\percent.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\period.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pgdn.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pgup.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plus.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pound.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\q.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\question mark.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\quote.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\r.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\right.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\s.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\semicolon.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\space.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\squarebracket.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\star.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\t.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tilde.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\u.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\underscore.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\up.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\v.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\w.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\x.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\y.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\z.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\cursor.png" />
+    <Resource Include="Images\left_high.png" />
+    <Resource Include="Images\left_low.png" />
+    <Resource Include="Images\left_med.png" />
+    <Resource Include="Images\right_high.png" />
+    <Resource Include="Images\right_low.png" />
+    <Resource Include="Images\right_med.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

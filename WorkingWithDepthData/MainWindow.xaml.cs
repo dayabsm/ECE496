@@ -95,6 +95,7 @@ namespace WorkingWithDepthData
 
         Queue<int> leftHandAreaQ = new Queue<int>();
         Queue<int> rightHandAreaQ = new Queue<int>();
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinectSensorChooser1.KinectSensorChanged += new DependencyPropertyChangedEventHandler(kinectSensorChooser1_KinectSensorChanged);
@@ -750,25 +751,29 @@ namespace WorkingWithDepthData
                 position = 1;
             if (radioButtonLeft2.IsChecked == true)
                 position = 3;
+            if (radioButtonLeft3.IsChecked == true)
+                position = 5;
             double angle = sliderLeft.Value;
 
-            textBoxLeft.Text = angle.ToString("#.##") + "°";
+            //textBoxLeft.Text = angle.ToString("#.##") + "°";
             //offset -> need to adjust probably
             angle = angle - 90;
-            
+
             Rotate(cursorLeft, wheelLeft, angle, position);
         }
 
         private void sliderRight_ValueChanged_1(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             int position = 0;
-            if (radioButtonLeft1.IsChecked == true)
+            if (radioButtonRight1.IsChecked == true)
                 position = 2;
-            if (radioButtonLeft2.IsChecked == true)
+            if (radioButtonRight2.IsChecked == true)
                 position = 4;
+            if (radioButtonRight3.IsChecked == true)
+                position = 6;
             double angle = sliderRight.Value;
 
-            textBoxRight.Text = angle.ToString("#.##") + "°";
+            //textBoxRight.Text = angle.ToString("#.##") + "°";
             //offset -> need to adjust probably
             angle = angle - 90;
 
@@ -778,29 +783,53 @@ namespace WorkingWithDepthData
         //last change feb 18
         private void Rotate(Image cursor, Image wheel, double angle, int position)
         {
-            // !! Use isLeftHandOpen and isRightHandOpen to detect closed fists!!
             BitmapImage newWheel = new BitmapImage();
             newWheel.BeginInit();
             if (position == 1)
-                newWheel.UriSource = new Uri(@"pack://application:,,,/images/layout1.png", UriKind.Absolute);
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/left_med.png", UriKind.Absolute);
             else if (position == 2)
-                newWheel.UriSource = new Uri(@"pack://application:,,,/images/layout2.png", UriKind.Absolute);
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/right_med.png", UriKind.Absolute);
             else if (position == 3)
-                newWheel.UriSource = new Uri(@"pack://application:,,,/images/layout3.png", UriKind.Absolute);
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/left_low.png", UriKind.Absolute);
             else if (position == 4)
-                newWheel.UriSource = new Uri(@"pack://application:,,,/images/layout4.png", UriKind.Absolute);
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/right_low.png", UriKind.Absolute);
+            else if (position == 5)
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/left_high.png", UriKind.Absolute);
+            else if (position == 6)
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/right_high.png", UriKind.Absolute);
             else
-                newWheel.UriSource = new Uri(@"pack://application:,,,/images/layout1.png", UriKind.Absolute);
+                newWheel.UriSource = new Uri(@"pack://application:,,,/images/left_med.png", UriKind.Absolute);  //make a empty layout
             newWheel.CacheOption = BitmapCacheOption.OnLoad;
             newWheel.EndInit();
             wheel.Source = newWheel;
-            //wheel.RenderTransform = new RotateTransform(angle);   //rotate wheel instead   
 
-            double new_angle = check_angles(angle, position);
-            if (new_angle != -999.999)
+            /*
+            Bitmap newWheel = new Bitmap(Properties.Resources.left_med);
+            if (position == 1)
+                newWheel = new Bitmap(Properties.Resources.left_med);
+            else if (position == 2)
+                newWheel = new Bitmap(Properties.Resources.right_med);
+            else if (position == 3)
+                newWheel = new Bitmap(Properties.Resources.left_low);
+            else if (position == 4)
+                newWheel = new Bitmap(Properties.Resources.right_low);
+            else if (position == 5)
+                newWheel = new Bitmap(Properties.Resources.left_high);
+            else if (position == 6)
+                newWheel = new Bitmap(Properties.Resources.right_high);
+            */
+            bool new_palm = check_palms(position);
+
+            //if (new_palm == true)
             {
-                double rounded_angle = Math.Round(new_angle, 0);
-                cursor.RenderTransform = new RotateTransform(rounded_angle);
+                double new_angle = check_angles(angle, position);
+                if (new_angle != -999.999)
+                {
+                    double rounded_angle = Math.Round(new_angle, 0);
+                    cursor.RenderTransform = new RotateTransform(rounded_angle);
+                    //playAudio(position, rounded_angle);
+                    playAudio(position, (int)rounded_angle + 90);
+                }
             }
             
         }
@@ -894,6 +923,23 @@ namespace WorkingWithDepthData
 
         private bool check_palms(int position)
         {
+            //GUI display
+            try
+            {
+                if (position % 2 == 0)
+                {
+                    labelRight.Content = isRightHandOpen.ToString();
+                }
+                else
+                {
+                    labelLeft.Content = isLeftHandOpen.ToString();
+                }
+            }
+            catch
+            {
+                //do nothing
+            }
+
             if (position % 2 == 0)    //right palm
             {
                 if (right_palm.Count >= MAX_BOOL)
@@ -906,7 +952,7 @@ namespace WorkingWithDepthData
                     right_palm.Enqueue(isRightHandOpen);
                     return false;
                 }
-                               
+
                 if (right_palm.Count >= MAX_BOOL)
                 {
                     int i = 1;
@@ -952,9 +998,11 @@ namespace WorkingWithDepthData
                         }
                         i = i + 1;
                     }
-
+                    labelRightFlag.Content = flag.ToString();
                     if (flag == 36) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
                     {
+                        SoundPlayer audio = new SoundPlayer(Properties.Resources.confirm);
+                        audio.Play();
                         return true;
                     }
                     else
@@ -1023,9 +1071,12 @@ namespace WorkingWithDepthData
                         }
                         i = i + 1;
                     }
+                    labelLeftFlag.Content = flag.ToString();
 
                     if (flag == 36) //only if every condition is met, the total sum must be 36, which means we detected a closing on opening of the palm
                     {
+                        SoundPlayer audio = new SoundPlayer(Properties.Resources.confirm);
+                        audio.Play();
                         return true;
                     }
                     else
@@ -1044,340 +1095,502 @@ namespace WorkingWithDepthData
         private void playAudio(int position, int angle)
         {
             int interval = 13;  //every letter has 13 degrees of seperation
-
+            SoundPlayer audio;
+            audio = new SoundPlayer(Properties.Resources.confirm);  //set to something to just make it compile
             //==============Left Hand Middle Start==================//
-            if ( (position==1)&&(angle>=OFFSET && angle<OFFSET+interval*1) )
+            if ((position == 1) && (angle >= OFFSET && angle < OFFSET + interval * 1))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.z);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "z";
+                audio = new SoundPlayer(Properties.Resources.z);                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*1 && OFFSET+angle<interval*2) )
+            if ((position == 1) && ((angle >= OFFSET + interval * 1) && angle < OFFSET + interval * 2))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.k);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "k";
+                audio = new SoundPlayer(Properties.Resources.k);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*2 && OFFSET+angle<interval*3) )
+            if ((position == 1) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.y);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "y";
+                audio = new SoundPlayer(Properties.Resources.y);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*3 && angle<OFFSET+interval*4) )
+            if ((position == 1) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.m);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "m";
+                audio = new SoundPlayer(Properties.Resources.m);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*4 && angle<OFFSET+interval*5) )
+            if ((position == 1) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.d);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "d";
+                audio = new SoundPlayer(Properties.Resources.d);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*5 && angle<OFFSET+interval*6) )
+            if ((position == 1) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.n);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "n";
+                audio = new SoundPlayer(Properties.Resources.n);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*6 && angle<OFFSET+interval*7) )
+            if ((position == 1) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.e);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "e";
+                audio = new SoundPlayer(Properties.Resources.e);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*7 && angle<OFFSET+interval*8) )
+            if ((position == 1) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.o);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "o";
+                audio = new SoundPlayer(Properties.Resources.o);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*8 && angle<OFFSET+interval*9) )
+            if ((position == 1) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.h);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "h";
+                audio = new SoundPlayer(Properties.Resources.h);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*9 && angle<OFFSET+interval*10) )
+            if ((position == 1) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.u);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "u";
+                audio = new SoundPlayer(Properties.Resources.u);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*10 && angle<OFFSET+interval*11) )
+            if ((position == 1) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.f);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "f";
+                audio = new SoundPlayer(Properties.Resources.f);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*11 && angle<OFFSET+interval*12) )
+            if ((position == 1) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.b);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "b";
+                audio = new SoundPlayer(Properties.Resources.b);
+                
             }
-            if ( (position==1)&&(angle>=OFFSET+interval*12 && angle<OFFSET+interval*13) )
+            if ((position == 1) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.x);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxLeft.Text = "z";
+                audio = new SoundPlayer(Properties.Resources.x);
+                
             }
             //==============Left Hand Middle End==================//
 
             //==============Right Hand Middle Start==================//
-            if ( (position==2)&&(angle>=OFFSET && angle<OFFSET+interval*1) )
+            if ((position == 2) && (angle >= OFFSET && angle < OFFSET + interval * 1))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.q);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "q";
+                audio = new SoundPlayer(Properties.Resources.q);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*1 && OFFSET+angle<interval*2) )
+            if ((position == 2) && (angle >= OFFSET + interval * 1 &&  angle < OFFSET + interval * 2))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.v);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "v";
+                audio = new SoundPlayer(Properties.Resources.v);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*2 && OFFSET+angle<interval*3) )
+            if ((position == 2) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.g);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "g";
+                audio = new SoundPlayer(Properties.Resources.g);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*3 && angle<OFFSET+interval*4) )
+            if ((position == 2) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.c);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "c";
+                audio = new SoundPlayer(Properties.Resources.c);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*4 && angle<OFFSET+interval*5) )
+            if ((position == 2) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.r);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "r";
+                audio = new SoundPlayer(Properties.Resources.r);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*5 && angle<OFFSET+interval*6) )
+            if ((position == 2) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.i);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "i";
+                audio = new SoundPlayer(Properties.Resources.i);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*6 && angle<OFFSET+interval*7) )
+            if ((position == 2) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.t);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "t";
+                audio = new SoundPlayer(Properties.Resources.t);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*7 && angle<OFFSET+interval*8) )
+            if ((position == 2) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.a);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "a";
+                audio = new SoundPlayer(Properties.Resources.a);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*8 && angle<OFFSET+interval*9) )
+            if ((position == 2) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.s);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "s";
+                audio = new SoundPlayer(Properties.Resources.s);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*9 && angle<OFFSET+interval*10) )
+            if ((position == 2) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.l);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "l";
+                audio = new SoundPlayer(Properties.Resources.l);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*10 && angle<OFFSET+interval*11) )
+            if ((position == 2) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.w);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "w";
+                audio = new SoundPlayer(Properties.Resources.w);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*11 && angle<OFFSET+interval*12) )
+            if ((position == 2) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.p);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "p";
+                audio = new SoundPlayer(Properties.Resources.p);
+                
             }
-            if ( (position==2)&&(angle>=OFFSET+interval*12 && angle<OFFSET+interval*13) )
+            if ((position == 2) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
             {
-                try
-                {
-                    SoundPlayer audio = new SoundPlayer(Properties.Resources.j);
-                    audio.Play();
-                }
-                catch (Exception ex)
-                {
-                    //do nothing
-                }
+                textBoxRight.Text = "j";
+                audio = new SoundPlayer(Properties.Resources.j);
+                
             }
             //==============Right Hand Middle End==================//
 
             //==============Left Hand Low Start==================//
-            //insert in here when need to change
+            if ((position == 3) && (angle >= OFFSET && angle < OFFSET + interval * 1))
+            {
+                textBoxLeft.Text = "(";
+                audio = new SoundPlayer(Properties.Resources.open_bracket);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
+            {
+                textBoxLeft.Text = "0";
+                audio = new SoundPlayer(Properties.Resources._0);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
+            {
+                textBoxLeft.Text = "1";
+                audio = new SoundPlayer(Properties.Resources._1);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
+            {
+                textBoxLeft.Text = "2";
+                audio = new SoundPlayer(Properties.Resources._2);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
+            {
+                textBoxLeft.Text = "3";
+                audio = new SoundPlayer(Properties.Resources._3);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
+            {
+                textBoxLeft.Text = "4";
+                audio = new SoundPlayer(Properties.Resources._4);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
+            {
+                textBoxLeft.Text = "space";
+                audio = new SoundPlayer(Properties.Resources.space);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
+            {
+                textBoxLeft.Text = "5";
+                audio = new SoundPlayer(Properties.Resources._5);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
+            {
+                textBoxLeft.Text = "6";
+                audio = new SoundPlayer(Properties.Resources._6);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
+            {
+                textBoxLeft.Text = "7";
+                audio = new SoundPlayer(Properties.Resources._7);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
+            {
+                textBoxLeft.Text = "8";
+                audio = new SoundPlayer(Properties.Resources._8);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
+            {
+                textBoxLeft.Text = "9";
+                audio = new SoundPlayer(Properties.Resources._9);
+                
+            }
+            if ((position == 3) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
+            {
+                textBoxLeft.Text = ")";
+                audio = new SoundPlayer(Properties.Resources.close_bracket);
+                
+            }
             //==============Left Hand Low End==================//
 
             //==============Right Hand Low Start==================//
-            //insert in here when need to change
+            if ((position == 4) && (angle >= OFFSET && angle < OFFSET + interval * 1))
+            {
+                textBoxRight.Text = "`";
+                audio = new SoundPlayer(Properties.Resources.graveaccent);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
+            {
+                textBoxRight.Text = "&";
+                audio = new SoundPlayer(Properties.Resources.Ampersand);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
+            {
+                textBoxRight.Text = "$";
+                audio = new SoundPlayer(Properties.Resources.money);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
+            {
+                textBoxRight.Text = "!";
+                audio = new SoundPlayer(Properties.Resources.exclamation);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
+            {
+                textBoxRight.Text = ":";
+                audio = new SoundPlayer(Properties.Resources.colon);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
+            {
+                textBoxRight.Text = "@";
+                audio = new SoundPlayer(Properties.Resources.at);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
+            {
+                textBoxRight.Text = "Enter";
+                audio = new SoundPlayer(Properties.Resources.enter);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
+            {
+                textBoxRight.Text = "←";
+                audio = new SoundPlayer(Properties.Resources.backspace);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
+            {
+                textBoxRight.Text = ",";
+                audio = new SoundPlayer(Properties.Resources.comma);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
+            {
+                textBoxRight.Text = "#";
+                audio = new SoundPlayer(Properties.Resources.pound);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
+            {
+                textBoxRight.Text = "%";
+                audio = new SoundPlayer(Properties.Resources.percent);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
+            {
+                textBoxRight.Text = "-";
+                audio = new SoundPlayer(Properties.Resources.minus);
+                
+            }
+            if ((position == 4) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
+            {
+                textBoxRight.Text = "/";
+                audio = new SoundPlayer(Properties.Resources.backslash);
+                
+            }
             //==============Right Hand Low End==================//
 
             //==============Left Hand High Start==================//
-            //insert in here when need to change
+            if ((position == 5) && (angle >= OFFSET && angle < OFFSET + interval * 1))
+            {
+                textBoxLeft.Text = "~";
+                audio = new SoundPlayer(Properties.Resources.tilde);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
+            {
+                textBoxLeft.Text = "^";
+                audio = new SoundPlayer(Properties.Resources.carrot);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
+            {
+                textBoxLeft.Text = "*";
+                audio = new SoundPlayer(Properties.Resources.star);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
+            {
+                textBoxLeft.Text = "_";
+                audio = new SoundPlayer(Properties.Resources.underscore);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
+            {
+                textBoxLeft.Text = "Left";
+                audio = new SoundPlayer(Properties.Resources.left);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
+            {
+                textBoxLeft.Text = "Up";
+                audio = new SoundPlayer(Properties.Resources.up);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
+            {
+                textBoxLeft.Text = "Space";
+                audio = new SoundPlayer(Properties.Resources.space);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
+            {
+                textBoxLeft.Text = "Down";
+                audio = new SoundPlayer(Properties.Resources.down);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
+            {
+                textBoxLeft.Text = "Right";
+                audio = new SoundPlayer(Properties.Resources.right);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
+            {
+                textBoxLeft.Text = "+";
+                audio = new SoundPlayer(Properties.Resources.plus);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
+            {
+                textBoxLeft.Text = "=";
+                audio = new SoundPlayer(Properties.Resources.equal);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
+            {
+                textBoxLeft.Text = ";";
+                audio = new SoundPlayer(Properties.Resources.semicolon);
+                
+            }
+            if ((position == 5) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
+            {
+                textBoxLeft.Text = "\\";
+                audio = new SoundPlayer(Properties.Resources.forwardslash);
+                
+            }
             //==============Left Hand High End==================//
 
             //==============Right Hand High Start==================//
-            //insert in here when need to change
+            if ((position == 6) && (angle >= OFFSET && angle < OFFSET + interval * 1))
+            {
+                textBoxRight.Text = "[";
+                audio = new SoundPlayer(Properties.Resources.squarebracket);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 1 && angle < OFFSET + interval * 2))
+            {
+                textBoxRight.Text = "{";
+                audio = new SoundPlayer(Properties.Resources.curlybracket);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 2 && angle < OFFSET + interval * 3))
+            {
+                textBoxRight.Text = "<";
+                audio = new SoundPlayer(Properties.Resources.lessthan);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
+            {
+                textBoxRight.Text = "\"";
+                audio = new SoundPlayer(Properties.Resources.quote);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 4 && angle < OFFSET + interval * 5))
+            {
+                textBoxRight.Text = "Home";
+                audio = new SoundPlayer(Properties.Resources.home);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
+            {
+                textBoxRight.Text = "PgUp";
+                audio = new SoundPlayer(Properties.Resources.pgup);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 6 && angle < OFFSET + interval * 7))
+            {
+                textBoxRight.Text = "Enter";
+                audio = new SoundPlayer(Properties.Resources.enter);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
+            {
+                textBoxRight.Text = "PgDn";
+                audio = new SoundPlayer(Properties.Resources.pgdn);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 8 && angle < OFFSET + interval * 9))
+            {
+                textBoxRight.Text = "End";
+                audio = new SoundPlayer(Properties.Resources.end);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
+            {
+                textBoxRight.Text = "?";
+                audio = new SoundPlayer(Properties.Resources.question_mark);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 10 && angle < OFFSET + interval * 11))
+            {
+                textBoxRight.Text = ">";
+                audio = new SoundPlayer(Properties.Resources.greaterthan);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
+            {
+                textBoxRight.Text = "}";
+                audio = new SoundPlayer(Properties.Resources.curlybracket);
+                
+            }
+            if ((position == 6) && (angle >= OFFSET + interval * 12 && angle < OFFSET + interval * 13))
+            {
+                textBoxRight.Text = "]";
+                audio = new SoundPlayer(Properties.Resources.squarebracket);
+                
+            }
             //==============Right Hand High End==================//
+
+            try
+            {
+                if (checkBoxSound.IsChecked == true)
+                    audio.Play();
+            }
+            catch
+            {
+                //do nothing
+            }
 
         }
         

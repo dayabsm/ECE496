@@ -174,6 +174,12 @@ namespace WorkingWithDepthData.Properties {
             }
         }
         
+        internal static System.IO.UnmanagedMemoryStream carrot {
+            get {
+                return ResourceManager.GetStream("carrot", resourceCulture);
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream close_bracket {
             get {
                 return ResourceManager.GetStream("close_bracket", resourceCulture);
@@ -198,6 +204,12 @@ namespace WorkingWithDepthData.Properties {
             }
         }
         
+        internal static System.IO.UnmanagedMemoryStream curlybracket {
+            get {
+                return ResourceManager.GetStream("curlybracket", resourceCulture);
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream d {
             get {
                 return ResourceManager.GetStream("d", resourceCulture);
@@ -213,6 +225,12 @@ namespace WorkingWithDepthData.Properties {
         internal static System.IO.UnmanagedMemoryStream e {
             get {
                 return ResourceManager.GetStream("e", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream end {
+            get {
+                return ResourceManager.GetStream("end", resourceCulture);
             }
         }
         
@@ -252,9 +270,27 @@ namespace WorkingWithDepthData.Properties {
             }
         }
         
+        internal static System.IO.UnmanagedMemoryStream graveaccent {
+            get {
+                return ResourceManager.GetStream("graveaccent", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream greaterthan {
+            get {
+                return ResourceManager.GetStream("greaterthan", resourceCulture);
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream h {
             get {
                 return ResourceManager.GetStream("h", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream home {
+            get {
+                return ResourceManager.GetStream("home", resourceCulture);
             }
         }
         
@@ -285,6 +321,12 @@ namespace WorkingWithDepthData.Properties {
         internal static System.IO.UnmanagedMemoryStream left {
             get {
                 return ResourceManager.GetStream("left", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream lessthan {
+            get {
+                return ResourceManager.GetStream("lessthan", resourceCulture);
             }
         }
         
@@ -342,6 +384,18 @@ namespace WorkingWithDepthData.Properties {
             }
         }
         
+        internal static System.IO.UnmanagedMemoryStream pgdn {
+            get {
+                return ResourceManager.GetStream("pgdn", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream pgup {
+            get {
+                return ResourceManager.GetStream("pgup", resourceCulture);
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream plus {
             get {
                 return ResourceManager.GetStream("plus", resourceCulture);
@@ -363,6 +417,12 @@ namespace WorkingWithDepthData.Properties {
         internal static System.IO.UnmanagedMemoryStream question_mark {
             get {
                 return ResourceManager.GetStream("question_mark", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream quote {
+            get {
+                return ResourceManager.GetStream("quote", resourceCulture);
             }
         }
         
@@ -396,15 +456,39 @@ namespace WorkingWithDepthData.Properties {
             }
         }
         
+        internal static System.IO.UnmanagedMemoryStream squarebracket {
+            get {
+                return ResourceManager.GetStream("squarebracket", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream star {
+            get {
+                return ResourceManager.GetStream("star", resourceCulture);
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream t {
             get {
                 return ResourceManager.GetStream("t", resourceCulture);
             }
         }
         
+        internal static System.IO.UnmanagedMemoryStream tilde {
+            get {
+                return ResourceManager.GetStream("tilde", resourceCulture);
+            }
+        }
+        
         internal static System.IO.UnmanagedMemoryStream u {
             get {
                 return ResourceManager.GetStream("u", resourceCulture);
+            }
+        }
+        
+        internal static System.IO.UnmanagedMemoryStream underscore {
+            get {
+                return ResourceManager.GetStream("underscore", resourceCulture);
             }
         }
         
