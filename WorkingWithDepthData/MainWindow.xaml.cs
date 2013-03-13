@@ -877,6 +877,7 @@ namespace WorkingWithDepthData
                         if (right_pressed == true)
                         {
                             //insert letter
+                            textBox1.Text = textBox1.Text + textBoxRight.Text;
                             right_pressed = false;
                         }
                     }
@@ -890,6 +891,7 @@ namespace WorkingWithDepthData
                         if (left_pressed == true)
                         {
                             //insert letter
+                            textBox1.Text = textBox1.Text + textBoxLeft.Text;
                             left_pressed = false;
                         }
                     }
