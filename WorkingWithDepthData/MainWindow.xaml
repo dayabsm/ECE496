@@ -23,7 +23,7 @@
             </Grid>
         </GroupBox>
         <GroupBox Header="Left Arm" Height="100" HorizontalAlignment="Left" Margin="12,52,0,0" Name="groupBoxLeft" VerticalAlignment="Top" Width="300">
-            <Grid>
+            <Grid Name="grid1" Loaded="grid1_Loaded">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="207*" />
                     <ColumnDefinition Width="Auto" />
@@ -42,20 +42,21 @@
                 <TextBox Background="{x:Null}" FontFamily="Calibri" FontSize="72" Height="100" HorizontalAlignment="Left" Margin="173,250,0,0" Name="textBoxRight" Opacity="1" Text="--°" TextAlignment="Center" VerticalAlignment="Top" Width="250" BorderBrush="{x:Null}" />
             </Grid>
         </GroupBox>
-        <TextBox Height="176" HorizontalAlignment="Right" Margin="0,12,318,0" Name="textBox1" VerticalAlignment="Top" Width="622" FontSize="36" FontFamily="Times New Roman" Text="Text Here" />
-        <GroupBox Header="Right Arm" Height="100" HorizontalAlignment="Left" Margin="946,52,0,0" Name="groupBoxRight" VerticalAlignment="Top" Width="300">
-            <Grid>
-                <RadioButton Content="medium" Height="16" HorizontalAlignment="Left" Margin="6,7,0,0" Name="radioButtonRight1" VerticalAlignment="Top" IsChecked="True" />
-                <RadioButton Content="low" Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="radioButtonRight2" VerticalAlignment="Top" />
-                <RadioButton Content="high" Height="16" HorizontalAlignment="Left" Margin="6,49,0,0" Name="radioButtonRight3" VerticalAlignment="Top" />
-                <Slider Height="23" HorizontalAlignment="Left" Margin="80,23,0,0" Name="sliderRight" VerticalAlignment="Top" Width="192" Maximum="180" Value="90" ValueChanged="sliderRight_ValueChanged_1" SmallChange="0.5" />
+        <TextBox Height="176" HorizontalAlignment="Right" Margin="0,12,318,0" Name="textBox1" VerticalAlignment="Top" Width="622" FontSize="36" FontFamily="Times New Roman" Text="" />
+        <GroupBox Header="Right Arm" Height="100" HorizontalAlignment="Left" Margin="946,52,0,0" Name="groupBoxRight" VerticalAlignment="Top" Width="300" Visibility="Hidden">
+            <Grid Visibility="Hidden">
+                <RadioButton Content="medium" Height="16" HorizontalAlignment="Left" Margin="6,7,0,0" Name="radioButtonRight1" VerticalAlignment="Top" IsChecked="True" Visibility="Hidden" />
+                <RadioButton Content="low" Height="16" HorizontalAlignment="Left" Margin="6,28,0,0" Name="radioButtonRight2" VerticalAlignment="Top" Visibility="Hidden" />
+                <RadioButton Content="high" Height="16" HorizontalAlignment="Left" Margin="6,49,0,0" Name="radioButtonRight3" VerticalAlignment="Top" Visibility="Hidden" />
+                <Slider Height="23" HorizontalAlignment="Left" Margin="80,23,0,0" Name="sliderRight" VerticalAlignment="Top" Width="192" Maximum="180" Value="90" ValueChanged="sliderRight_ValueChanged_1" SmallChange="0.5" Visibility="Hidden" />
             </Grid>
         </GroupBox>
+            <Image Height="169" Name="image2" Stretch="Fill" VerticalAlignment="Top" Width="267" HorizontalAlignment="Right" Margin="0,6,39,0" />
             <Label Content="Is L.Palm Open" Height="28" HorizontalAlignment="Left" Margin="114,160,0,0" Name="labelLeft" VerticalAlignment="Top" />
             <Label Content="Palm Value" Height="28" HorizontalAlignment="Left" Margin="223,160,0,0" Name="labelLeftFlag" VerticalAlignment="Top" />
-            <Label Content="Is R.Palm Open" Height="28" HorizontalAlignment="Right" Margin="0,160,136,0" Name="labelRight" VerticalAlignment="Top" />
-            <Label Content="Palm Value" Height="28" HorizontalAlignment="Left" Margin="1123,160,0,0" Name="labelRightFlag" VerticalAlignment="Top" />
-            <CheckBox Content="Audio" Height="16" HorizontalAlignment="Left" Margin="952,165,0,0" Name="checkBoxSound" VerticalAlignment="Top" IsChecked="True" />
+            <Label Content="Is R.Palm Open" Height="28" HorizontalAlignment="Right" Margin="0,176,136,0" Name="labelRight" VerticalAlignment="Top" />
+            <Label Content="Palm Value" Height="28" HorizontalAlignment="Left" Margin="1123,176,0,0" Name="labelRightFlag" VerticalAlignment="Top" />
+            <CheckBox Content="Audio" Height="16" HorizontalAlignment="Left" Margin="952,181,0,0" Name="checkBoxSound" VerticalAlignment="Top" IsChecked="True" />
         </Grid>
     </Grid>
 </Window>

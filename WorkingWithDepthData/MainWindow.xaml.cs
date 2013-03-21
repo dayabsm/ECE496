@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using Microsoft.Kinect;
 using System.Diagnostics;
 using System.Media;
+using System.Windows.Forms;
 
 using System.Drawing.Drawing2D;
 
@@ -193,6 +194,29 @@ namespace WorkingWithDepthData
                 leftHand.x = leftHandDepthPoint.X;
                 leftHand.y = leftHandDepthPoint.Y;
 
+                bool leftHandHidden = false;
+                bool rightHandHidden = false;
+
+                if ((first.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred) || (first.Joints[JointType.HandLeft].TrackingState == JointTrackingState.NotTracked))
+                {
+                    leftHandHidden = true;
+                }
+
+                else
+                {
+                    leftHandHidden = false;
+                }
+
+                if ((first.Joints[JointType.HandRight].TrackingState == JointTrackingState.Inferred) || (first.Joints[JointType.HandRight].TrackingState == JointTrackingState.NotTracked))
+                {
+                    rightHandHidden = true;
+                }
+
+                else
+                {
+                    rightHandHidden = false;
+                }
+
                 byte[] pixels = GenerateColoredBytes(depthFrame, out leftFingerTips, out rightFingerTips);
 
                 //number of bytes per row width * 4 (B,G,R,Empty)
@@ -255,12 +279,23 @@ namespace WorkingWithDepthData
                 //offset -> need to adjust probably
                 angle = angle - 90;
 
-                if (first.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred)
+
+                if (rightHandHidden && leftHandHidden)
                 {
-                    // TODO: Handle the case where hand is not being used - what do we want to show in GUI?
+                    minDepthBox.Text = "Both Hands Hidden";
                 }
 
-                else
+                else if (rightHandHidden)
+                {
+                    minDepthBox.Text = "Right Hand Hidden";
+                }
+
+                else if (leftHandHidden)
+                {
+                    minDepthBox.Text = "Left Hand Hidden";
+                }
+                
+                if (!leftHandHidden)
                 {
                     Rotate(cursorLeft, wheelLeft, angle, position);
                 }
@@ -280,27 +315,25 @@ namespace WorkingWithDepthData
                 //offset -> need to adjust probably
                 angle = angle - 90;
 
-                
-
-                if (first.Joints[JointType.HandRight].TrackingState == JointTrackingState.Inferred)
+                if (!rightHandHidden)
                 {
-                    // TODO: Handle the case where hand is not being used - what do we want to show in GUI?
-                    minDepthBox.Text = "Hidden";
-                }
-
-                else
-                {
-                    minDepthBox.Text = "Left Angle: " + angleValLeft + " Right Angle: " + angleValRight;
                     Rotate(cursorRight, wheelRight, angle, position);
                 }
 
-                
 
+                if (!rightHandHidden && !leftHandHidden)
+                {
+                    minDepthBox.Text = "Left: " + angleValLeft + ", Right: " + angleValRight;
+                }
 
                
 
                 //create image
                 image1.Source =
+                    BitmapSource.Create(depthFrame.Width, depthFrame.Height,
+                    96, 96, PixelFormats.Bgr32, null, pixels, stride);
+                //create image
+                image2.Source =
                     BitmapSource.Create(depthFrame.Width, depthFrame.Height,
                     96, 96, PixelFormats.Bgr32, null, pixels, stride); 
             }
@@ -484,6 +517,7 @@ namespace WorkingWithDepthData
                             lastYIndex_left = pixel.y;
                             if (pixelIsOnContour(pixel, rawDepthData))
                             {
+                                // change back to true if we want trosoReduction (TM)
                                 leftBlobFound = true;
                                 contourLeft.Add(pixel);
                             }
@@ -509,7 +543,7 @@ namespace WorkingWithDepthData
                             lastYIndex_right = pixel.y;
                             if (pixelIsOnContour(pixel, rawDepthData))
                             {
-                                // Keep track of largest minimum value
+                                // change back to true if we want trosoReduction (TM)
                                 rightBlobFound = true;
                                 contourRight.Add(pixel);
                                 
@@ -535,39 +569,49 @@ namespace WorkingWithDepthData
                 }   
             }
 
+            string toWrite = " " + rightHandArea + "\n";
+
+            //Append new text to an existing file 
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\Daya\Desktop\areaTrace.txt", true))
+            {
+                file.WriteLine(toWrite);
+            }  
+
             leftHandAreaQ.Enqueue(leftHandArea);
             rightHandAreaQ.Enqueue(rightHandArea);
 
             // If hand area reduces by 1.5, we have a closed fist
             try
             {
-                if ((isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea > 1.5)) || !isLeftHandOpen)
+                if ((isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea > 1.3) /*&& (leftHandAreaQ.Peek() / leftHandArea < 100)*/) || !isLeftHandOpen)
                 {
                     //minDepthBox.Foreground = Brushes.Green;
                     isLeftHandOpen = false;
                 }
 
                 // Closed Hand -> Open
-                if ((!isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea < 0.6)) || isLeftHandOpen)
+                if ((!isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea < 0.6) /*&& (leftHandAreaQ.Peek() / leftHandArea > 0.2)*/) || isLeftHandOpen)
                 {
                     //minDepthBox.Foreground = Brushes.Red;
                     isLeftHandOpen = true;
                 }
 
+                // Once it fills to 30 frames, we are dequeuing, this might be the problem?
                 if (leftHandAreaQ.Count == 30)
                 {
                     leftHandAreaQ.Dequeue();
                 }
 
                 // If hand area reduces by 1.5, we have a closed fist
-                if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)) || !isRightHandOpen)
+                // PROBLEM MIGHT BE WITH THE SECOND CONDITION - NOT SURE
+                if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)/* && (rightHandAreaQ.Peek() / rightHandArea < 100)*/) || !isRightHandOpen)
                 {
                     minDepthBox.Foreground = Brushes.Green;
                     isRightHandOpen = false;
                 }
 
                 // Closed Hand -> Open
-                if ((!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6)) || isRightHandOpen)
+                if ((!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6) /*&& (rightHandAreaQ.Peek() / rightHandArea > 0.2)*/) || isRightHandOpen)
                 {
                     minDepthBox.Foreground = Brushes.Red;
                     isRightHandOpen = true;
@@ -1677,6 +1721,34 @@ namespace WorkingWithDepthData
                 testUI.Visibility = Visibility.Hidden;
                 actualUI.Visibility = Visibility.Visible;
             }
+        }
+
+        private void grid1_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Create the interop host control.
+            System.Windows.Forms.Integration.WindowsFormsHost host =
+                new System.Windows.Forms.Integration.WindowsFormsHost();
+
+            // Create the MaskedTextBox control.
+            MaskedTextBox mtbDate = new MaskedTextBox("00/00/0000");
+
+            var source = new AutoCompleteStringCollection();
+            string[] dictionary = System.IO.File.ReadAllLines("c:\\Share\\words.txt");
+            source.AddRange(dictionary);
+
+            var textbox = new System.Windows.Forms.TextBox
+            {
+                AutoCompleteCustomSource = source,
+                AutoCompleteMode = AutoCompleteMode.Append,
+                AutoCompleteSource = AutoCompleteSource.CustomSource
+            };
+
+            // Assign the MaskedTextBox control as the host control's child.
+            host.Child = textbox;
+
+            // Add the interop host control to the Grid 
+            // control's collection of child controls. 
+            this.grid1.Children.Add(host);
         }
     }
 }
