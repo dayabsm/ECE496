@@ -234,6 +234,7 @@ namespace WorkingWithDepthData
                 textBoxLeft.Text = angle.ToString("#.##") + "°";
                 //offset -> need to adjust probably
                 angle = angle - 90;
+                angle = ((int)(angle/12)) * 12;
                 Rotate(cursorLeft, wheelLeft, angle, position);
 
                 if (rightWrist.y < head.y)
