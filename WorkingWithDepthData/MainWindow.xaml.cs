@@ -18,11 +18,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 using System.Diagnostics;
-
 using System.Drawing.Drawing2D;
 
 namespace WorkingWithDepthData
 {
+    
         public struct position
     {
         public float x;
@@ -59,11 +59,21 @@ namespace WorkingWithDepthData
             InitializeComponent();
         }
 
+        const int FramesPerAction = 15;
+        const float ActionThreshold = 0.1f; // distance in meters
+        const int IdleFramesAfterAction = 30; // Note: This should be greater than FramesPerAction!
+
+        float[] postab = new float[FramesPerAction];
+        int currentFrame = 0;
+        int idleFramesRemaining = IdleFramesAfterAction;
+
+
         public static int angleRight = -1;
         public static int angleLeft = -1;
 
         int numCol;
         int numRows;
+        bool push = false; 
 
         const int skeletonCount = 6;
         Skeleton[] allSkeletons = new Skeleton[skeletonCount];
@@ -77,6 +87,8 @@ namespace WorkingWithDepthData
         int minDepthLeft = int.MaxValue;
         int minDepthRight = int.MaxValue;
         int minDepth;
+
+        float prevRightDepth;
         
         const float MaxDepthDistance = 4095; // max value returned
         const float MinDepthDistance = 850; // min value returned
@@ -103,12 +115,13 @@ namespace WorkingWithDepthData
             var newSensor = (KinectSensor)e.NewValue;
             if (newSensor == null)
             {
+                idleFramesRemaining = IdleFramesAfterAction;
                 return;
             }
 
             // turn on features that you need
             newSensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30); // changed the res here
-
+            
             /// CHANGE CODE HERE IF NEEDED!!!!!!
             newSensor.SkeletonStream.Enable(/*new TransformSmoothParameters()
             {
@@ -121,6 +134,7 @@ namespace WorkingWithDepthData
 
             newSensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(newSensor_AllFramesReady);
 
+            
 
             try
             {
@@ -147,6 +161,50 @@ namespace WorkingWithDepthData
 
             position rightFingerTips;
             position leftFingerTips;
+
+            Joint rightHandPos = first.Joints[JointType.HandRight];
+           
+
+            if (rightHandPos.TrackingState != JointTrackingState.Tracked)
+            {
+                idleFramesRemaining = IdleFramesAfterAction;
+                return;
+
+            }
+
+            float currentPos = rightHandPos.Position.Z;
+            push = false;
+            if (idleFramesRemaining == 0)
+            {
+                float comparePos = postab[currentFrame];
+                if (currentPos - comparePos > ActionThreshold)
+                {
+                    minDepthBox.Foreground = Brushes.DeepSkyBlue;
+                    textBox1.Text = textBox1.Text + "Q";
+                    idleFramesRemaining = IdleFramesAfterAction + 1;
+                    
+                }
+                else if (comparePos - currentPos > ActionThreshold)
+                {
+                    minDepthBox.Foreground = Brushes.DarkGoldenrod;
+                    textBox1.Text = textBox1.Text + "W";
+                    idleFramesRemaining = IdleFramesAfterAction + 1;
+                }
+            }
+
+            // Store current position and advance current frame index (regardless of whether we're idle)
+
+            postab[currentFrame] = currentPos;
+            currentFrame = (currentFrame + 1) % postab.Length;
+
+            // If we're in the idle state, decrement the idle counter
+
+            if (idleFramesRemaining > 0)
+            {
+                --idleFramesRemaining;
+            }
+
+            //minDepthBox.Foreground = Brushes.DeepSkyBlue;
             using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
             {
                 if (depthFrame == null)
@@ -160,18 +218,18 @@ namespace WorkingWithDepthData
                 DepthImagePoint headDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.Head].Position);
 
                 DepthImagePoint rightHandDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.HandRight].Position);
+                
                 DepthImagePoint rightElbowDepthPoint = depthFrame.MapFromSkeletonPoint(first.Joints[JointType.ElbowRight].Position);
 
                 rightElbow.x = rightElbowDepthPoint.X;
                 rightElbow.y = rightElbowDepthPoint.Y;
-
-
 
                 head.x = headDepthPoint.X;
                 head.y = headDepthPoint.Y;
 
                 rightHand.x = rightHandDepthPoint.X;
                 rightHand.y = rightHandDepthPoint.Y;
+               
 
                 byte[] pixels = GenerateColoredBytes(depthFrame, out leftFingerTips, out rightFingerTips);
 
