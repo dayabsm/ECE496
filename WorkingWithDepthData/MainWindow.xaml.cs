@@ -295,10 +295,11 @@ namespace WorkingWithDepthData
                     minDepthBox.Text = "Left Hand Hidden";
                 }
                 
-                if (!leftHandHidden)
-                {
-                    Rotate(cursorLeft, wheelLeft, angle, position);
-                }
+                //if (!leftHandHidden)
+                //{
+                //    Rotate(cursorLeft, wheelLeft, angle, position);
+                //}
+                Rotate(cursorLeft, wheelLeft, angle, position);
 
                 if (rightWrist.y < head.y)
                 {
@@ -558,77 +559,82 @@ namespace WorkingWithDepthData
                     }
                 }
 
+                // UNCOMMENT THIS FOR TORSO-REDUCTOMETER
                 // Once we reach the end of every row
-                if (pixel.x >= numCol - 1)
+                /*if (pixel.x >= numCol - 1)
                 {
                     //Check if we found any new hand points in this row
                     if (leftBlobFound && lastYIndex_left < pixel.y)
                         leftCaptureDone = true;
                     if (rightBlobFound && lastYIndex_right < pixel.y)
                         rightCaptureDone = true;
-                }   
+                }*/
             }
 
             string toWrite = " " + rightHandArea + "\n";
 
             //Append new text to an existing file 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\Daya\Desktop\areaTrace.txt", true))
+            /*using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\Daya\Desktop\areaTrace.txt", true))
             {
                 file.WriteLine(toWrite);
-            }  
+            } */
+            
 
-            leftHandAreaQ.Enqueue(leftHandArea);
-            rightHandAreaQ.Enqueue(rightHandArea);
+            //--------------------FOR AREA UNCOMMENT FROM HERE ----------------------------------
 
-            // If hand area reduces by 1.5, we have a closed fist
-            try
-            {
-                if ((isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea > 1.3) /*&& (leftHandAreaQ.Peek() / leftHandArea < 100)*/) || !isLeftHandOpen)
-                {
-                    //minDepthBox.Foreground = Brushes.Green;
-                    isLeftHandOpen = false;
-                }
+            //leftHandAreaQ.Enqueue(leftHandArea);
+            //rightHandAreaQ.Enqueue(rightHandArea);
 
-                // Closed Hand -> Open
-                if ((!isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea < 0.6) /*&& (leftHandAreaQ.Peek() / leftHandArea > 0.2)*/) || isLeftHandOpen)
-                {
-                    //minDepthBox.Foreground = Brushes.Red;
-                    isLeftHandOpen = true;
-                }
+            //// If hand area reduces by 1.5, we have a closed fist
+            //try
+            //{
+            //    if ((isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea > 1.3) /*&& (leftHandAreaQ.Peek() / leftHandArea < 100)*/) || !isLeftHandOpen)
+            //    {
+            //        //minDepthBox.Foreground = Brushes.Green;
+            //        isLeftHandOpen = false;
+            //    }
 
-                // Once it fills to 30 frames, we are dequeuing, this might be the problem?
-                if (leftHandAreaQ.Count == 30)
-                {
-                    leftHandAreaQ.Dequeue();
-                }
+            //    // Closed Hand -> Open
+            //    if ((!isLeftHandOpen && (leftHandAreaQ.Peek() / leftHandArea < 0.6) /*&& (leftHandAreaQ.Peek() / leftHandArea > 0.2)*/) || isLeftHandOpen)
+            //    {
+            //        //minDepthBox.Foreground = Brushes.Red;
+            //        isLeftHandOpen = true;
+            //    }
 
-                // If hand area reduces by 1.5, we have a closed fist
-                // PROBLEM MIGHT BE WITH THE SECOND CONDITION - NOT SURE
-                if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)/* && (rightHandAreaQ.Peek() / rightHandArea < 100)*/) || !isRightHandOpen)
-                {
-                    minDepthBox.Foreground = Brushes.Green;
-                    isRightHandOpen = false;
-                }
+            //    // Once it fills to 30 frames, we are dequeuing, this might be the problem?
+            //    if (leftHandAreaQ.Count == 30)
+            //    {
+            //        leftHandAreaQ.Dequeue();
+            //    }
 
-                // Closed Hand -> Open
-                if ((!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6) /*&& (rightHandAreaQ.Peek() / rightHandArea > 0.2)*/) || isRightHandOpen)
-                {
-                    minDepthBox.Foreground = Brushes.Red;
-                    isRightHandOpen = true;
-                }
+            //    // If hand area reduces by 1.5, we have a closed fist
+            //    // PROBLEM MIGHT BE WITH THE SECOND CONDITION - NOT SURE
+            //    if ((isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea > 1.5)/* && (rightHandAreaQ.Peek() / rightHandArea < 100)*/) || !isRightHandOpen)
+            //    {
+            //        minDepthBox.Foreground = Brushes.Green;
+            //        isRightHandOpen = false;
+            //    }
 
-                if (rightHandAreaQ.Count == 30)
-                {
-                    rightHandAreaQ.Dequeue();
-                }
-            }
+            //    // Closed Hand -> Open
+            //    if ((!isRightHandOpen && (rightHandAreaQ.Peek() / rightHandArea < 0.6) /*&& (rightHandAreaQ.Peek() / rightHandArea > 0.2)*/) || isRightHandOpen)
+            //    {
+            //        minDepthBox.Foreground = Brushes.Red;
+            //        isRightHandOpen = true;
+            //    }
 
-            catch (DivideByZeroException e)
-            {
-                // New Area is equal to zero
-                // Make no changes
-            }
+            //    if (rightHandAreaQ.Count == 30)
+            //    {
+            //        rightHandAreaQ.Dequeue();
+            //    }
+            //}
 
+            //catch (DivideByZeroException e)
+            //{
+            //    // New Area is equal to zero
+            //    // Make no changes
+            //}
+
+            //--------------------FOR AREA UNCOMMENT TO HERE ----------------------------------
             // FIX THIS CRAP
             findLongestDistance(contourLeft, out leftWrist, out leftFingerTip);
             findLongestDistance(contourRight, out rightWrist, out rightFingerTip);
@@ -650,6 +656,7 @@ namespace WorkingWithDepthData
             catch (Exception e)
             {
             }
+
 
 
             leftCoords.x = leftFingerTip.x;
@@ -1220,7 +1227,7 @@ namespace WorkingWithDepthData
             }
             if ((position == 1) && ((angle >= OFFSET + interval * 1) && angle < OFFSET + interval * 2))
             {
-                textBoxLeft.Text = "k";
+                textBoxLeft.Text = "z";
                 audio = new SoundPlayer(Properties.Resources.k);
                 return_letter = "k";                
             }
@@ -1232,7 +1239,7 @@ namespace WorkingWithDepthData
             }
             if ((position == 1) && (angle >= OFFSET + interval * 3 && angle < OFFSET + interval * 4))
             {
-                textBoxLeft.Text = "m";
+                textBoxLeft.Text = "y";
                 audio = new SoundPlayer(Properties.Resources.m);
                 return_letter = "m";                 
             }
@@ -1244,7 +1251,7 @@ namespace WorkingWithDepthData
             }
             if ((position == 1) && (angle >= OFFSET + interval * 5 && angle < OFFSET + interval * 6))
             {
-                textBoxLeft.Text = "n";
+                textBoxLeft.Text = "d";
                 audio = new SoundPlayer(Properties.Resources.n);
                 return_letter = "";
             }
@@ -1256,7 +1263,7 @@ namespace WorkingWithDepthData
             }
             if ((position == 1) && (angle >= OFFSET + interval * 7 && angle < OFFSET + interval * 8))
             {
-                textBoxLeft.Text = "o";
+                textBoxLeft.Text = "e";
                 audio = new SoundPlayer(Properties.Resources.o);
                 return_letter = "";
             }
@@ -1268,7 +1275,7 @@ namespace WorkingWithDepthData
             }
             if ((position == 1) && (angle >= OFFSET + interval * 9 && angle < OFFSET + interval * 10))
             {
-                textBoxLeft.Text = "u";
+                textBoxLeft.Text = "h";
                 audio = new SoundPlayer(Properties.Resources.u);
                 return_letter = "";
             }
@@ -1280,7 +1287,7 @@ namespace WorkingWithDepthData
             }
             if ((position == 1) && (angle >= OFFSET + interval * 11 && angle < OFFSET + interval * 12))
             {
-                textBoxLeft.Text = "b";
+                textBoxLeft.Text = "f";
                 audio = new SoundPlayer(Properties.Resources.b);
                 return_letter = "";
             }
